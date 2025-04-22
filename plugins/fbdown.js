@@ -5,7 +5,7 @@ cmd(
   {
     pattern: "fb",
     alias: ["facebook"],
-    react: "💀",
+    react: "📥",
     desc: "Download Facebook Video",
     category: "download",
     filename: __filename,
@@ -40,7 +40,7 @@ cmd(
     }
   ) => {
     try {
-      if (!q) return reply("*Please provide a valid Facebook video URL!* 🌚❤️");
+      if (!q) return reply("*Please provide a valid Facebook video URL!* ❌");
 
       // Validate the Facebook URL format
       const fbRegex = /(https?:\/\/)?(www\.)?(facebook|fb)\.com\/.+/;
@@ -53,19 +53,19 @@ cmd(
       const result = await getFbVideoInfo(q);
 
       if (!result || (!result.sd && !result.hd)) {
-        return reply("*Failed to download video. Please try again later.* 🌚");
+        return reply("*Failed to download video. Please try again later.* ❌");
       }
 
       const { title, sd, hd } = result;
 
       // Prepare and send the message with video details
       let desc = `
-*❤️ ROBIN FB VIDEO DOWNLOADER ❤️*
+*MAHII-MD-V2*
 
 👻 *Title*: ${title || "Unknown"}
 👻 *Quality*: ${hd ? "HD Available" : "SD Only"}
 
-𝐌𝐚𝐝𝐞 𝐛𝐲 𝐒_𝐈_𝐇_𝐈_𝐋_𝐄_𝐋
+𝐌𝐚𝐝𝐞 𝐛𝐲 MIHIRANGA
         `;
       await robin.sendMessage(
         from,
@@ -96,10 +96,10 @@ cmd(
           { quoted: mek }
         );
       } else {
-        return reply("*No downloadable video found!* 🌚");
+        return reply("*No downloadable video found!* ❌");
       }
 
-      return reply("*Thanks for using my bot* 🌚❤️");
+      return reply("*Thanks for using MAHII-MD* ❤️");
     } catch (e) {
       console.error(e);
       reply(`*Error:* ${e.message || e}`);
