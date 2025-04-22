@@ -1,13 +1,12 @@
 const { cmd, commands } = require("../command");
 const config = require('../config');
 
-
 cmd(
   {
     pattern: "menu",
-    alise: ["getmenu"],
+    alias: ["getmenu"],
     react: "📜",
-    desc: "get cmd list",
+    desc: "Get bot command list",
     category: "main",
     filename: __filename,
   },
@@ -17,26 +16,7 @@ cmd(
     m,
     {
       from,
-      quoted,
-      body,
-      isCmd,
-      command,
-      args,
-      q,
-      isGroup,
-      sender,
-      senderNumber,
-      botNumber2,
-      botNumber,
       pushname,
-      isMe,
-      isOwner,
-      groupMetadata,
-      groupName,
-      participants,
-      groupAdmins,
-      isBotAdmins,
-      isAdmins,
       reply,
     }
   ) => {
@@ -51,17 +31,16 @@ cmd(
       };
 
       for (let i = 0; i < commands.length; i++) {
-        if (commands[i].pattern && !commands[i].dontAddCommandList) {
-          menu[
-            commands[i].category
-          ] += `${config.PREFIX}${commands[i].pattern}\n`;
+        const cmd = commands[i];
+        if (cmd.pattern && !cmd.dontAddCommandList) {
+          const line = `┃   ▪️ ${config.PREFIX}${cmd.pattern}\n`;
+          if (menu[cmd.category]) {
+            menu[cmd.category] += line;
+          }
         }
       }
 
-      let madeMenu = `*Hello WELCOME  ${pushname}*
-
-
-⛧━━━━━[ *MAHII-MD-V2 MENU* ]━━━━━⛧
+      const madeMenu = `⛧━━━━━[ *MAHII-MD-V2 MENU* ]━━━━━⛧
 ╭─╼━━━━━━━━━━━━━━━━━━╾─╮
 ┃ ⚙️ *MAIN COMMANDS* ⚙️
 ┃   ▪️ .alive
@@ -80,8 +59,7 @@ cmd(
 
 ╭─╼━━━━━━━━━━━━━━━━━━╾─╮
 ┃ 👥 *GROUP COMMANDS* 👥
-${menu.group}
-╰─╼━━━━━━━━━━━━━━━━━━╾─╯
+${menu.group || "┃   ⚠️ No commands available\n"}╰─╼━━━━━━━━━━━━━━━━━━╾─╯
 
 ╭─╼━━━━━━━━━━━━━━━━━━╾─╮
 ┃ 👑 *OWNER COMMANDS* 👑
@@ -99,11 +77,9 @@ ${menu.group}
 
 ╭─╼━━━━━━━━━━━━━━━━━━╾─╮
 ┃ 🔍 *SEARCH COMMANDS* 🔍
-${menu.search}
-╰─╼━━━━━━━━━━━━━━━━━━╾─╯
+${menu.search || "┃   ⚠️ No commands available\n"}╰─╼━━━━━━━━━━━━━━━━━━╾─╯
 
-⛧━━━━━━[ 🖤 MADE BY MIHIRANGA 🖤 ]━━━━━━⛧ `;
-
+⛧━━━━━━[ 🖤 MADE BY MIHIRANGA 🖤 ]━━━━━━⛧`;
 
       await robin.sendMessage(
         from,
@@ -116,8 +92,8 @@ ${menu.search}
         { quoted: mek }
       );
     } catch (e) {
-      console.log(e);
-      reply(`${e}`);
+      console.error(e);
+      reply("❌ Menu error:\n" + e);
     }
   }
 );
