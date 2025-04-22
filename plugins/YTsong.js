@@ -48,18 +48,23 @@ cmd(
       const url = data.url;
 
       // Song metadata description
-      let desc = `
-*MAHII-MD DOWNLOADER*
+    let desc = `
+╭───────⬣
+│  🧩 *MAHII-MD DOWNLOADER* 🧩
+╰──────────────⬣
 
- *title* : ${data.title}
- *description* : ${data.description}
- *time* : ${data.timestamp}
- *ago* : ${data.ago}
- *views* : ${data.views}
- *url* : ${data.url}
+📌 *Title:* ${data.title}
+📝 *Description:* ${data.description}
+⏱️ *Uploaded:* ${data.timestamp} (${data.ago} ago)
+👀 *Views:* ${data.views}
 
-𝐌𝐚𝐝𝐞 𝐛𝐲 *MIHIRANGA*
+🔗 *Download URL:* 
+${data.url}
+
+━━━━━━━━━━━━━━━━━━
+🚀 𝐌𝐚𝐝𝐞 𝐛𝐲 *MIHIRANGA*
 `;
+
 
       // Send metadata thumbnail message
       await robin.sendMessage(
