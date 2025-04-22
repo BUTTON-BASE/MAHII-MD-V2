@@ -1,20 +1,19 @@
-const {readEnv} = require('../lib/database')
-const {cmd , commands} = require('../command')
+const { cmd } = require("../command");
+const { readEnv } = require("../lib/database");
 
-cmd({
+cmd(
+  {
     pattern: "alive",
-    desc: "Check bot online or no.",
+    desc: "Show bot status",
     category: "main",
-    filename: __filename
-},
-async(robin, mek, m,{from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-try{
-const config = await readEnv();
-return await robin.sendMessage(from,{image: {url: config.ALIVE_IMG},caption: config.ALIVE_MSG},{quoted: mek})
-    
-}catch(e){
-console.log(e)
-reply(`${e}`)
-}
-})
-
+    filename: __filename,
+    fromMe: false
+  },
+  async (robin, m, msg, extras) => {
+    const config = await readEnv();
+    await robin.sendMessage(m.key.remoteJid, {
+      image: { url: config.ALIVE_IMG },
+      caption: config.ALIVE_MSG
+    }, { quoted: m });
+  }
+);
