@@ -57,42 +57,58 @@ cmd(
         }
       }
 
-      let madeMenu = `👋 *Hello  ${pushname}*
+      let madeMenu = `*Hello WELCOME  ${pushname}*
 
 
-| *MAIN COMMANDS* |
-    ▫️.alive
-    ▫️.menu
-    ▫️.ai <text>
-    ▫️.system
-    ▫️.owner
-| *DOWNLOAD COMMANDS* |
-    ▫️.song <text>
-    ▫️.video <text>
-    ▫️.fb <link>
-| *GROUP COMMANDS* |
+⛧━━━━━[ *MAHII-MD-V2 MENU* ]━━━━━⛧
+╭─╼━━━━━━━━━━━━━━━━━━╾─╮
+┃ ⚙️ *MAIN COMMANDS* ⚙️
+┃   ▪️ .alive
+┃   ▪️ .menu
+┃   ▪️ .ai <text>
+┃   ▪️ .system
+┃   ▪️ .owner
+╰─╼━━━━━━━━━━━━━━━━━━╾─╯
+
+╭─╼━━━━━━━━━━━━━━━━━━╾─╮
+┃ 📥 *DOWNLOAD COMMANDS* 📥
+┃   ▪️ .song <text>
+┃   ▪️ .video <text>
+┃   ▪️ .fb <link>
+╰─╼━━━━━━━━━━━━━━━━━━╾─╯
+
+╭─╼━━━━━━━━━━━━━━━━━━╾─╮
+┃ 👥 *GROUP COMMANDS* 👥
 ${menu.group}
-| *OWNER COMMANDS* |
-    ▫️.restart
-    ▫️.update
-| *CONVERT COMMANDS* |
-    ▫️.sticker <reply img>
-    ▫️.img <reply sticker>
-    ▫️.tr <lang><text>
-    ▫️.tts <text>
-| *SEARCH COMMANDS* |
+╰─╼━━━━━━━━━━━━━━━━━━╾─╯
+
+╭─╼━━━━━━━━━━━━━━━━━━╾─╮
+┃ 👑 *OWNER COMMANDS* 👑
+┃   ▪️ .restart
+┃   ▪️ .update
+╰─╼━━━━━━━━━━━━━━━━━━╾─╯
+
+╭─╼━━━━━━━━━━━━━━━━━━╾─╮
+┃ 🔁 *CONVERT COMMANDS* 🔁
+┃   ▪️ .sticker <reply img>
+┃   ▪️ .img <reply sticker>
+┃   ▪️ .tr <lang> <text>
+┃   ▪️ .tts <text>
+╰─╼━━━━━━━━━━━━━━━━━━╾─╯
+
+╭─╼━━━━━━━━━━━━━━━━━━╾─╮
+┃ 🔍 *SEARCH COMMANDS* 🔍
 ${menu.search}
+╰─╼━━━━━━━━━━━━━━━━━━╾─╯
 
+⛧━━━━━━[ 🖤 MADE BY MIHIRANGA 🖤 ]━━━━━━⛧
 
-🥶𝐌𝐚𝐝𝐞 𝐛𝐲 𝐒_𝐈_𝐇_𝐈_𝐋_𝐄_𝐋🥶
-
-> ROBIN MENU MSG
 `;
       await robin.sendMessage(
         from,
         {
           image: {
-            url: "https://raw.githubusercontent.com/Dark-Robin/Bot-Helper/refs/heads/main/autoimage/Bot%20robin%20menu.jpg",
+            url: "https://github.com/Mahii-Botz/Mahii-md-LOGO/blob/main/ChatGPT%20Image%20Apr%2021,%202025,%2005_32_50%20PM.png?raw=true",
           },
           caption: madeMenu,
         },
