@@ -39,5 +39,6 @@ and at your own risk.
 💬 Bot crafted by Mihiranga
 \`\`\``,
 AUTO_READ_STATUS: process.env.AUTO_READ_STATUS || "true",
+AUTO_REACT_STATUS: process.env.AUTO_REACT_STATUS || "true",
 MODE : process.env.Mode || "public",
 };
