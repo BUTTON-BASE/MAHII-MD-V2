@@ -40,7 +40,7 @@ cmd(
     }
   ) => {
     try {
-      if (!q) return reply("*නමක් හරි ලින්ක් එකක් හරි දෙන්න* 🌚❤️");
+      if (!q) return reply("*Please provide a song name or link.* ⚠ ");
 
       // Search for the video
       const search = await yts(q);
@@ -49,16 +49,16 @@ cmd(
 
       // Song metadata description
       let desc = `
-*❤️ROBIN SONG DOWNLOADER❤️*
+*MAHII-MD SONG DOWNLODER*
 
-👻 *title* : ${data.title}
-👻 *description* : ${data.description}
-👻 *time* : ${data.timestamp}
-👻 *ago* : ${data.ago}
-👻 *views* : ${data.views}
-👻 *url* : ${data.url}
+ *title* : ${data.title}
+ *description* : ${data.description}
+ *time* : ${data.timestamp}
+ *ago* : ${data.ago}
+ *views* : ${data.views}
+ *url* : ${data.url}
 
-𝐌𝐚𝐝𝐞 𝐛𝐲 𝐒_𝐈_𝐇_𝐈_𝐋_𝐄_𝐋
+𝐌𝐚𝐝𝐞 𝐛𝐲 *MIHIRANGA*
 `;
 
       // Send metadata thumbnail message
@@ -105,7 +105,7 @@ cmd(
         { quoted: mek }
       );
 
-      return reply("*Thanks for using my bot* 🌚❤️");
+      return reply("*Thanks for using my bot* ❤️");
     } catch (e) {
       console.log(e);
       reply(`❌ Error: ${e.message}`);
