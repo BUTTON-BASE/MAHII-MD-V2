@@ -4,6 +4,7 @@ const { readEnv } = require("../lib/database");
 cmd(
   {
     pattern: "alive",
+    react : "🤖"
     desc: "Show bot status",
     category: "main",
     filename: __filename,
