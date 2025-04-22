@@ -62,8 +62,8 @@ cmd(
       let desc = `
 *MAHII-MD-V2*
 
-👻 *Title*: ${title || "Unknown"}
-👻 *Quality*: ${hd ? "HD Available" : "SD Only"}
+ *Title*: ${title || "Unknown"}
+ *Quality*: ${hd ? "HD Available" : "SD Only"}
 
 𝐌𝐚𝐝𝐞 𝐛𝐲 MIHIRANGA
         `;
@@ -71,7 +71,7 @@ cmd(
         from,
         {
           image: {
-            url: "https://raw.githubusercontent.com/Dark-Robin/Bot-Helper/refs/heads/main/autoimage/Bot%20fb-1.jpg",
+            url: "https://github.com/Mahii-Botz/Mahii-md-LOGO/blob/main/ChatGPT%20Image%20Apr%2021,%202025,%2005_32_50%20PM.png?raw=true",
           },
           caption: desc,
         },
