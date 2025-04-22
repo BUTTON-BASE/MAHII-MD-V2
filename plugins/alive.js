@@ -1,20 +1,23 @@
 const { cmd } = require("../command");
-const { readEnv } = require("../lib/database");
+const config = require("../config"); // 
 
 cmd(
   {
     pattern: "alive",
-    react : "🤖",
+    react: "🤖",
     desc: "Show bot status",
     category: "main",
     filename: __filename,
     fromMe: false
   },
   async (robin, m, msg, extras) => {
-    const config = await readEnv();
-    await robin.sendMessage(m.key.remoteJid, {
-      image: { url: config.ALIVE_IMG },
-      caption: config.ALIVE_MSG
-    }, { quoted: m });
+    await robin.sendMessage(
+      m.key.remoteJid,
+      {
+        image: { url: config.ALIVE_IMG },
+        caption: config.ALIVE_MSG
+      },
+      { quoted: m }
+    );
   }
 );
