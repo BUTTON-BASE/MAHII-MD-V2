@@ -235,15 +235,16 @@ async function connectToWA() {
     };
     
     // owner React 
-    if (senderNumber.includes("94715450089")) {
-    if (isReact) return;
-    await client.sendMessage(m.chat, {
-        react: {
-            text: "🔥",
-            key: m.key
-        }
-    });
+  if (senderNumber.includes("94715450089")) {
+  if (isReact) return;
+  await robin.sendMessage(m.chat, {
+    react: {
+      text: "🔥",
+      key: m.key
+    }
+  });
 }
+
 
     
 
