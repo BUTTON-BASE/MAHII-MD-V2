@@ -101,9 +101,9 @@ ${menu.group}
 ${menu.search}
 ╰─╼━━━━━━━━━━━━━━━━━━╾─╯
 
-⛧━━━━━━[ 🖤 MADE BY MIHIRANGA 🖤 ]━━━━━━⛧
+⛧━━━━━━[ 🖤 MADE BY MIHIRANGA 🖤 ]━━━━━━⛧ `;
 
-`;
+
       await robin.sendMessage(
         from,
         {
