@@ -1,6 +1,6 @@
 const { cmd, commands } = require("../command");
 const yts = require("yt-search");
-const { ytmp3 } = require(" @vreden/youtube_scraper");
+const ytdl = require("ytdl-core");
 
 cmd(
   {
@@ -40,39 +40,31 @@ cmd(
     }
   ) => {
     try {
-      if (!q) return reply("*Please provide a song name or link.* ⚠ ");
+      if (!q) return reply("*Please provide a song name or link.* ⚠");
 
-      // Search for the video
       const search = await yts(q);
       const data = search.videos[0];
       const url = data.url;
 
-      // Song metadata description
       let desc = `
-*MAHII-MD SONG DOWNLODER*
+*🎵 MAHII-MD SONG DOWNLOADER 🎵*
 
- *title* : ${data.title}
- *description* : ${data.description}
- *time* : ${data.timestamp}
- *ago* : ${data.ago}
- *views* : ${data.views}
- *url* : ${data.url}
+*🎧 Title:* ${data.title}
+*🕐 Duration:* ${data.timestamp}
+*📅 Uploaded:* ${data.ago}
+*👁️ Views:* ${data.views}
+*🔗 URL:* ${data.url}
 
-𝐌𝐚𝐝𝐞 𝐛𝐲 *MIHIRANGA*
-`;
+_𝐌𝐚𝐝𝐞 𝐛𝐲 *MIHIRANGA*_
+      `;
 
-      // Send metadata thumbnail message
       await robin.sendMessage(
         from,
         { image: { url: data.thumbnail }, caption: desc },
         { quoted: mek }
       );
 
-      // Download the audio using @vreden/youtube_scraper
-      const quality = "128"; // Default quality
-      const songData = await ytmp3(url, quality);
-
-      // Validate song duration (limit: 30 minutes)
+      // Duration check
       let durationParts = data.timestamp.split(":").map(Number);
       let totalSeconds =
         durationParts.length === 3
@@ -80,35 +72,25 @@ cmd(
           : durationParts[0] * 60 + durationParts[1];
 
       if (totalSeconds > 1800) {
-        return reply("⏱️ audio limit is 30 minitues");
+        return reply("⏱️ Sorry, audio limit is 30 minutes.");
       }
 
-      // Send audio file
+      const stream = ytdl(url, { filter: "audioonly", quality: "highestaudio" });
+
       await robin.sendMessage(
         from,
         {
-          audio: { url: songData.download.url },
+          audio: stream,
           mimetype: "audio/mpeg",
+          ptt: false,
         },
         { quoted: mek }
       );
 
-      // Send as a document (optional)
-      await robin.sendMessage(
-        from,
-        {
-          document: { url: songData.download.url },
-          mimetype: "audio/mpeg",
-          fileName: `${data.title}.mp3`,
-          caption: "𝐌𝐚𝐝𝐞 𝐛𝐲 𝐒_𝐈_𝐇_𝐈_𝐋_𝐄_𝐋",
-        },
-        { quoted: mek }
-      );
-
-      return reply("*Thanks for using my bot* ❤️");
+      return reply("*✅ Downloaded Successfully!* 🎶");
     } catch (e) {
-      console.log(e);
-      reply(`❌ Error: ${e.message}`);
+      console.error(e);
+      return reply(`❌ Error: ${e.message}`);
     }
   }
 );
