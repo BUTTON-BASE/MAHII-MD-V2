@@ -1,9 +1,10 @@
 <div align="center">
-  <img src="https://github.com/Mahii-Botz/Mahii-md-LOGO/blob/main/banner.png?raw=true" width="100%" alt="MAHII-MD Banner"/>
-  
-  <h1 style="color:#00ffea; font-size: 40px; font-family: 'Segoe UI', sans-serif;">
+
+  <h1 style="color:#00ffea; font-size: 45px; font-family: 'Segoe UI', sans-serif; animation: glow 2s ease-in-out infinite alternate, bounce 2s infinite;">
     🚀 MAHII-MD - WHATSAPP BOT 🤖
   </h1>
+
+  <img src="https://github.com/Mahii-Botz/Mahii-md-LOGO/blob/main/ChatGPT%20Image%20Apr%2021,%202025,%2005_32_50%20PM.png?raw=true" width="100%" alt="MAHII-MD Banner"/>
 
   <p style="font-size: 18px; color:#dddddd;">
     Powerful WhatsApp Bot Using <strong>Baileys</strong> 🔥<br/>
@@ -31,4 +32,6 @@
   <hr style="margin: 40px 0; border: 1px dashed #00ffea;" />
 
   <p style="font-size: 14px; color:#888888;">Made with 💙 by <strong>MIHIRANGA</strong> | 🇱🇰 Sri Lanka</p>
+
 </div>
+
