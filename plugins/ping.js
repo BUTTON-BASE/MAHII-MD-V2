@@ -13,6 +13,6 @@ cmd(
     await robin.sendMessage(mek.key.remoteJid, { text: "Pinging..." }, { quoted: mek });
 
     const ping = Date.now() - start;
-    reply(`🏓 Pong! Latency: ${ping}ms`);
+    reply(`*🏓MAHII-MD PONG!*: ${ping}ms`);
   }
 );
