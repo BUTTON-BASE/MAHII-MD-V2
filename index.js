@@ -53,8 +53,6 @@ const port = process.env.PORT || 8000;
 //=============================================
 
 async function connectToWA() {
- 
-  
   //===========================
 
   console.log("Connecting MAHII-MD");
@@ -108,6 +106,7 @@ async function connectToWA() {
       });
     }
   });
+
   robin.ev.on("creds.update", saveCreds);
   robin.ev.on("messages.upsert", async (mek) => {
     mek = mek.messages[0];
@@ -116,41 +115,21 @@ async function connectToWA() {
       getContentType(mek.message) === "ephemeralMessage"
         ? mek.message.ephemeralMessage.message
         : mek.message;
-  if (
-  mek.key &&
-  mek.key.remoteJid === "status@broadcast"
-) {
-  if (config.AUTO_READ_STATUS === "true") {
-    try {
-      await robin.readMessages([mek.key]);
-      console.log("📖 Status message marked as read");
-    } catch (err) {
-      console.error("❌ Failed to mark status as read:", err);
-    }
-  }
 
-  if (config.AUTO_REACT_STATUS === "true") {
-    const reactionEmojis = [
-      "❤️", "😂", "😍", "🔥", "👍", "😮",
-      "😭", "😎", "🤯", "💀", "🥺", "🤤",
-      "🫶", "😏", "👀", "💯", "🤡", "🫠",
-    ];
-    const randomReact =
-      reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
-
-    try {
-      await robin.sendMessage(mek.key.remoteJid, {
-        react: {
-          text: randomReact,
-          key: mek.key,
-        },
-      });
-      console.log("💬 Auto-reacted to status with:", randomReact);
-    } catch (err) {
-      console.error("❌ Failed to react to status:", err);
+    // Check if the message is a status update
+    if (
+      mek.key &&
+      mek.key.remoteJid === "status@broadcast" &&
+      config.AUTO_READ_STATUS === "true"
+    ) {
+      try {
+        await robin.readMessages([mek.key]);
+        console.log("📖 Status message marked as read");
+      } catch (err) {
+        console.error("❌ Failed to mark status as read:", err);
+      }
     }
-  }
-}
+
     const m = sms(robin, mek);
     const type = getContentType(mek.message);
     const content = JSON.stringify(mek.message);
@@ -271,9 +250,6 @@ async function connectToWA() {
     }
   });
 }
-
-
-    
 
     //work type
     if (!isOwner && config.MODE === "private") return;
@@ -435,12 +411,14 @@ async function connectToWA() {
     //============================================================================
   });
 }
+
 app.get("/", (req, res) => {
   res.send("hey, MAHII-MD started✅");
 });
 app.listen(port, () =>
   console.log(`Server listening on port http://localhost:${port}`)
 );
+
 setTimeout(() => {
   connectToWA();
 }, 4000);
