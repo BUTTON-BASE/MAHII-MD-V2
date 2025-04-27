@@ -29,9 +29,9 @@ cmd(
         url = search.videos[0].url;
       }
 
-      // Fetch video details & download link
+      // Fetch video details & download link using ytvideo function
       const videoData = await ytvideo(url);
-      if (!videoData) return reply("❌ Could not retrieve video data!");
+      if (!videoData || !videoData.videoDetails) return reply("❌ Could not retrieve video data!");
 
       const info = videoData.videoDetails;
       const seconds = info.lengthSeconds;
@@ -54,13 +54,14 @@ cmd(
 🚀 *Made by MIHIRANGA*
       `.trim();
 
+      // Send metadata and thumbnail image
       await robin.sendMessage(
         mek.key.remoteJid,
         { image: { url: info.thumbnails.pop().url }, caption },
         { quoted: mek }
       );
 
-      // Send the MP4 video
+      // Send the MP4 video file
       await robin.sendMessage(
         mek.key.remoteJid,
         {
