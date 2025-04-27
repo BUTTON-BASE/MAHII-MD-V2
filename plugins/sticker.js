@@ -1,3 +1,4 @@
+// plugins/sticker.js
 const { cmd } = require("../command");
 const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
 
@@ -12,9 +13,9 @@ cmd(
   },
   async (robin, mek, m, { quoted, reply }) => {
     try {
-      // Make sure they replied to an image
-      if (!quoted || !quoted.message.imageMessage) {
-        return reply("❌ Reply to an image with .sticker to convert it!");
+      // Check if the user replied with an image message
+      if (!quoted || !quoted.message || !quoted.message.imageMessage) {
+        return reply("❌ Please reply to an image with .sticker to convert it!");
       }
 
       // Download the image as a buffer
@@ -26,9 +27,10 @@ cmd(
 
       // Send it back as a sticker
       await robin.sendMessage(mek.key.remoteJid, { sticker: buffer }, { quoted: mek });
+      reply("✅ Sticker created successfully!");
     } catch (e) {
-      console.error(e);
-      reply("❌ Failed to convert image to sticker.");
+      console.error("Error converting image to sticker:", e);
+      reply("❌ Failed to convert image to sticker. Please try again.");
     }
   }
 );
