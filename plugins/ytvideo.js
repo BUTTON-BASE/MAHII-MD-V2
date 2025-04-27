@@ -25,16 +25,20 @@ cmd(
       const url = data.url;
 
       // Video metadata description
-      let desc = `🎥 *ROBIN MAX VIDEO DOWNLOADER* 🎥
-      
-👻 *Title* : ${data.title}
-👻 *Duration* : ${data.timestamp}
-👻 *Views* : ${data.views}
-👻 *Uploaded* : ${data.ago}
-👻 *Channel* : ${data.author.name}
-👻 *Link* : ${data.url}
+      let desc = `🧩 *MAHII-MD DOWNLOADER* 🧩
+📌 *Title:* ${data.title}
 
-𝐌𝐚𝐝𝐞 𝐛𝐲 ROBIN MAX
+📝 *Description:* ${data.description}
+
+⏱️ *Uploaded:* ${data.timestamp} (${data.ago} ago)
+
+👀 *Views:* ${data.views}
+
+🔗 *Download URL:* 
+${data.url}
+
+━━━━━━━━━━━━━━━━━━
+*𝙈𝘼𝘿𝙀 𝘽𝙔 𝙈𝙃𝙄𝙍𝘼𝙉𝙂𝘼*
 `;
 
       // Send metadata and thumbnail message
