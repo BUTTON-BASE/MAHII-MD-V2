@@ -37,9 +37,12 @@ cmd(
     const caption = `
 *👨‍💻 Developer Info*
 
-👤 *Name:* ${developerInfo.name}
+👤 *Name:* ${developerInfo.name} 
+
 📞 *Contact:* ${developerInfo.number}
+
 💻 *GitHub:* ${developerInfo.github}
+
 📝 *Note:* ${developerInfo.note}
     `.trim();
 
