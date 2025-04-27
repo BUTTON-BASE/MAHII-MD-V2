@@ -27,7 +27,7 @@ cmd(
 cmd(
   {
     pattern: "send",
-    alias: ["ewanna", "ewapan", "daanna"], // Aliases for sending status
+    alias: ["getstatus", "mystatus"], // Changed aliases for sending status to avoid conflict
     desc: "Send saved status as a reply",
     category: "status",
     react: "📲",
@@ -37,9 +37,15 @@ cmd(
   async (robin, mek, m, { reply }) => {
     const status = statusStore[mek.key.remoteJid];
 
+    // Debugging: Log the remoteJid and the stored status
+    console.log("User JID: ", mek.key.remoteJid);
+    console.log("Saved Status: ", status);
+
     if (!status) return reply("❌ No status saved for you! Use .save <your status>");
 
+    // Send the saved status as a message
     await robin.sendMessage(mek.key.remoteJid, { text: status }, { quoted: mek });
+
     return reply("✅ Status sent successfully!");
   }
 );
