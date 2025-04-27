@@ -7,7 +7,7 @@ function convertToBool(text, fault = "true") {
 }
 
 module.exports = {
-  SESSION_ID: process.env.SESSION_ID || "zAgFFCaD#n1b2hzMKKwaX2GKaG6gO5Hfem_zWbpDtU-Ur0ZEW92Q",
+  SESSION_ID: process.env.SESSION_ID || "TVpwnLKb#aWWVm73vUkMECqBjyF_0LP47pVV3FKTbIFHLwQrFcq0",
   OWNER_NUM: process.env.OWNER_NUM || "94714971189",
   PREFIX: process.env.PREFIX || ".",
   ALIVE_IMG: process.env.ALIVE_IMG || "https://github.com/Mahii-Botz/Mahii-md-LOGO/blob/main/ChatGPT%20Image%20Apr%2021,%202025,%2005_32_50%20PM.png?raw=true",
