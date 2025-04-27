@@ -1,6 +1,7 @@
 module.exports = {
   name: 'developer',
   command: ['.developer'],
+  react: "👨‍💻",
   description: 'Show developer info with image and intro text',
   async execute(sock, msg, args) {
     const developerInfo = {
