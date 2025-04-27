@@ -1,6 +1,5 @@
-
 const { cmd } = require("../command");
-const { downloadMediaMessage } = require("../lib/msg");
+const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
 
 cmd(
   {
@@ -14,12 +13,16 @@ cmd(
   async (robin, mek, m, { quoted, reply }) => {
     try {
       // Make sure they replied to an image
-      if (!quoted || !quoted.imageMessage) {
+      if (!quoted || !quoted.message.imageMessage) {
         return reply("❌ Reply to an image with .sticker to convert it!");
       }
 
       // Download the image as a buffer
-      const buffer = await downloadMediaMessage(quoted, { returnAs: "buffer" });
+      const stream = await downloadContentFromMessage(quoted.message.imageMessage, "image");
+      let buffer = Buffer.from([]);
+      for await (const chunk of stream) {
+        buffer = Buffer.concat([buffer, chunk]);
+      }
 
       // Send it back as a sticker
       await robin.sendMessage(mek.key.remoteJid, { sticker: buffer }, { quoted: mek });
