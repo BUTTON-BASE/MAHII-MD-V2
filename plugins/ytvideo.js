@@ -1,76 +1,92 @@
-// plugins/video.js
 const { cmd } = require("../command");
 const yts = require("yt-search");
-const { ytvideo } = require("@vreden/youtube_scraper");
+const axios = require("axios");
 
 cmd(
   {
     pattern: "video",
-    alias: ["mp4", "ytvideo"],
-    desc: "Download YouTube video as MP4",
+    react: "🎥",
+    desc: "Download YouTube Video",
     category: "download",
-    react: "📹",
     filename: __filename,
-    fromMe: false,
   },
-  async (robin, mek, m, { reply, args }) => {
+  async (
+    robin,
+    mek,
+    m,
+    { from, quoted, body, isCmd, command, args, q, isGroup, sender, reply }
+  ) => {
     try {
-      const query = args.join(" ");
-      if (!query) return reply("❌ Please provide a YouTube URL or search term!");
+      if (!q) return reply("*Provide a name or a YouTube link.* 🎥❤️ ");
 
-      // Simple URL validation
-      let url;
-      try {
-        url = new URL(query).toString();
-      } catch {
-        // Not a URL, do a search
-        const search = await yts(query);
-        if (!search.videos.length) return reply("❌ No videos found for that query!");
-        url = search.videos[0].url;
-      }
+      // Search for the video
+      const search = await yts(q);
+      const data = search.videos[0];
+      const url = data.url;
 
-      // Fetch video details & download link using ytvideo function
-      const videoData = await ytvideo(url);
-      if (!videoData || !videoData.videoDetails) return reply("❌ Could not retrieve video data!");
+      // Video metadata description
+      let desc = `🎥 *ROBIN MAX VIDEO DOWNLOADER* 🎥
+      
+👻 *Title* : ${data.title}
+👻 *Duration* : ${data.timestamp}
+👻 *Views* : ${data.views}
+👻 *Uploaded* : ${data.ago}
+👻 *Channel* : ${data.author.name}
+👻 *Link* : ${data.url}
 
-      const info = videoData.videoDetails;
-      const seconds = info.lengthSeconds;
-      if (seconds > 600) return reply("⏱️ Video longer than 10 minutes, cannot download.");
+𝐌𝐚𝐝𝐞 𝐛𝐲 ROBIN MAX
+`;
 
-      // Send thumbnail + metadata
-      const caption = `
-╭───⬣
-│  📹 *MAHII-MD VIDEO DOWNLOADER* 📹
-╰────────────⬣
-
-📌 *Title:* ${info.title}
-
-⏱️ *Duration:* ${Math.floor(seconds/60)}m ${seconds%60}s
-
-👀 *Views:* ${info.viewCount}
-
-🔗 *URL:* ${url}
-
-🚀 *Made by MIHIRANGA*
-      `.trim();
-
-      // Send metadata and thumbnail image
+      // Send metadata and thumbnail message
       await robin.sendMessage(
-        mek.key.remoteJid,
-        { image: { url: info.thumbnails.pop().url }, caption },
+        from,
+        { image: { url: data.thumbnail }, caption: desc },
         { quoted: mek }
       );
 
-      // Send the MP4 video file
+      // Video download function
+      const downloadVideo = async (url, quality) => {
+        const apiUrl = https://p.oceansaver.in/ajax/download.php?format=${quality}&url=${encodeURIComponent(
+          url
+        )}&api=dfcb6d76f2f6a9894gjkege8a4ab232222;
+        const response = await axios.get(apiUrl);
+
+        if (response.data && response.data.success) {
+          const { id, title } = response.data;
+
+          // Wait for download URL generation
+          const progressUrl = `https://p.oceansaver.in/ajax/progress.php?id=${id};`
+          while (true) {
+            const progress = await axios.get(progressUrl);
+            if (progress.data.success && progress.data.progress === 1000) {
+              const videoBuffer = await axios.get(progress.data.download_url, {
+                responseType: "arraybuffer",
+              });
+              return { buffer: videoBuffer.data, title };
+            }
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+          }
+        } else {
+          throw new Error("Failed to fetch video details.");
+        }
+      };
+
+      // Specify desired quality (default: 720p)
+      const quality = "720";
+
+      // Download and send video
+      const video = await downloadVideo(url, quality);
       await robin.sendMessage(
-        mek.key.remoteJid,
+        from,
         {
-          video: { url: info.videoUrl },
-          mimetype: "video/mp4",
-          caption: `✅ Downloaded: ${info.title}`,
+          video: video.buffer,
+          caption: `🎥 *${video.title}*\n\n Ⓒ ALL RIGHT RECEIVED MAHII-MD`,
+
         },
         { quoted: mek }
       );
+
+      reply("*Thanks for using my bot!* 🎥");
     } catch (e) {
       console.error(e);
       reply(`❌ Error: ${e.message}`);
