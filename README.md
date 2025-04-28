@@ -1,7 +1,8 @@
 <div align="center">
 
-  <h1 style="color:#00ffea; font-size: 45px; font-family: 'Segoe UI', sans-serif; animation: glow 2s ease-in-out infinite alternate, bounce 2s infinite;">
-    🚀 MAHII-MD - WHATSAPP BOT 🤖
+  <h1 align="center"> 
+    <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=25&duration=3000&color=00FF00&background=000000&center=true&vCenter=true&width=600&lines=⚡+MAHII+MD+V2+BOT;🔥+Ultimate+WhatsApp+Bot;💻+Created+by+Mihiranga+&+Mihiranga;🚀+Fast+Secure+Powerful;🌟+Join+the+Future+of+Bots!" alt="Typing Animation">
+
   </h1>
 
   <img src="https://github.com/Mahii-Botz/Mahii-md-LOGO/blob/main/ChatGPT%20Image%20Apr%2021,%202025,%2005_32_50%20PM.png?raw=true" width="100%" alt="MAHII-MD Banner"/>
