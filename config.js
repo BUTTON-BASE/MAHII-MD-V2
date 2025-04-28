@@ -43,7 +43,8 @@ AUTO_REACT_STATUS: process.env.AUTO_REACT_STATUS || "true",
 MODE : process.env.Mode || "public",
 AUTO_VOICE: process.env.AUTO_VOICE || "true",
 AUTO_STICKER : process.env.AUTO_STICKER || "true",
-AUTO_REPLY : process.env.AUTO_REPLY || "true",
+AUTO_REPLY : process.env.AUTO_REPLY || "true", 
+AUTO_STATUS_LIKE: process.env.AUTO_STATUS_LIKE || "true", 
 
 
 };
