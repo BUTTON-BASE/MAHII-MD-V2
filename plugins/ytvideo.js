@@ -1,3 +1,4 @@
+// plugins/ytvideo.js
 const { cmd } = require("../command");
 const yts = require("yt-search");
 const axios = require("axios");
@@ -10,82 +11,80 @@ cmd(
     category: "download",
     filename: __filename,
   },
-  async (
-    robin,
-    mek,
-    m,
-    { from, quoted, body, isCmd, command, args, q, isGroup, sender, reply }
-  ) => {
+  async (robin, mek, m, { from, args, reply }) => {
     try {
-      if (!q) return reply("*Provide a name or a YouTube link.* 🎥❤️ ");
+      const q = args.join(" ");
+      if (!q) return reply("*Provide a name or a YouTube link.* 🎥❤️");
 
-      // Search for the video
-      const search = await yts(q);
-      const data = search.videos[0];
-      const url = data.url;
+      // 1) Find the URL
+      let url = q;
+      try {
+        url = new URL(q).toString();
+      } catch {
+        const s = await yts(q);
+        if (!s.videos.length) return reply("❌ No videos found!");
+        url = s.videos[0].url;
+      }
 
-      // Video metadata description
-      let desc = `🧩 *MAHII-MD DOWNLOADER* 🧩
-📌 *Title:* ${data.title}
+      // 2) Send metadata + thumbnail
+      const info = (await yts(url)).videos[0];
+      const desc = `
+🧩 *MAHII-MD DOWNLOADER* 🧩
+📌 *Title:* ${info.title}
 
-📝 *Description:* ${data.description}
+📝 *Description:* ${info.description}
 
-⏱️ *Uploaded:* ${data.timestamp} (${data.ago} ago)
+⏱️ *Uploaded:* ${info.timestamp} (${info.ago} ago)
 
-👀 *Views:* ${data.views}
+👀 *Views:* ${info.views}
 
-🔗 *Download URL:* 
-${data.url}
+🔗 *Download URL:*
+${info.url}
 
 ━━━━━━━━━━━━━━━━━━
 *𝙈𝘼𝘿𝙀 𝘽𝙔 𝙈𝙃𝙄𝙍𝘼𝙉𝙂𝘼*
-`;
+      `.trim();
 
-      // Send metadata and thumbnail message
       await robin.sendMessage(
         from,
-        { image: { url: data.thumbnail }, caption: desc },
+        { image: { url: info.thumbnail }, caption: desc },
         { quoted: mek }
       );
 
-      // Video download function
-      const downloadVideo = async (url, quality) => {
-        const apiUrl = https://p.oceansaver.in/ajax/download.php?format=${quality}&url=${encodeURIComponent(
-          url
-        )}&api=dfcb6d76f2f6a9894gjkege8a4ab232222;
-        const response = await axios.get(apiUrl);
+      // 3) Video download helper
+      const downloadVideo = async (videoUrl, quality = "720") => {
+        // <-- wrap the URL in backticks so ${} works correctly
+        const apiUrl = `https://p.oceansaver.in/ajax/download.php?format=${quality}&url=${encodeURIComponent(
+          videoUrl
+        )}&api=dfcb6d76f2f6a9894gjkege8a4ab232222`;
 
-        if (response.data && response.data.success) {
-          const { id, title } = response.data;
+        const res = await axios.get(apiUrl);
+        if (!res.data.success) throw new Error("Failed to fetch video details.");
 
-          // Wait for download URL generation
-          const progressUrl = `https://p.oceansaver.in/ajax/progress.php?id=${id};`
-          while (true) {
-            const progress = await axios.get(progressUrl);
-            if (progress.data.success && progress.data.progress === 1000) {
-              const videoBuffer = await axios.get(progress.data.download_url, {
-                responseType: "arraybuffer",
-              });
-              return { buffer: videoBuffer.data, title };
-            }
-            await new Promise((resolve) => setTimeout(resolve, 5000));
+        const { id, title } = res.data;
+        // <-- remove the stray semicolon from the URL
+        const progressUrl = `https://p.oceansaver.in/ajax/progress.php?id=${id}`;
+
+        // poll until ready
+        while (true) {
+          const prog = (await axios.get(progressUrl)).data;
+          if (prog.success && prog.progress === 1000) {
+            const vid = await axios.get(prog.download_url, { responseType: "arraybuffer" });
+            return { buffer: vid.data, title };
           }
-        } else {
-          throw new Error("Failed to fetch video details.");
+          // wait 5s and poll again
+          await new Promise((r) => setTimeout(r, 5000));
         }
       };
 
-      // Specify desired quality (default: 720p)
-      const quality = "720";
-
-      // Download and send video
-      const video = await downloadVideo(url, quality);
+      // 4) Download + send
+      const { buffer, title } = await downloadVideo(url, "720");
       await robin.sendMessage(
         from,
         {
-          video: video.buffer,
-          caption: `🎥 *${video.title}*\n\n Ⓒ ALL RIGHT RECEIVED MAHII-MD`,
-
+          video: buffer,
+          mimetype: "video/mp4",
+          caption: `🎥 *${title}*\n\nⒸ ALL RIGHTS RESERVED MAHII-MD`,
         },
         { quoted: mek }
       );
