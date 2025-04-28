@@ -40,40 +40,45 @@ cmd(
         }
       }
 
-      const madeMenu = `*Hey Welcome  ${pushname}*
-⛧━━━━━[ *MAHII-MD-V2 MENU* ]━━━━━⛧
+      const madeMenu = `𝐘𝐨𝐨 𝐰𝐡𝐚𝐭𝐳𝐩 𝐁𝐎𝐙𝐀 ${pushname}
+  *Wᴇʟᴄᴏᴍᴇ Tᴏ MAHII-MD* 
 
-╭─╼━━━━━━━━━━━━━━━━━━╾─╮
-┃ ⚙️ *MAIN COMMANDS* ⚙️
-┃   ▪️ .alive
-┃   ▪️ .menu
-┃   ▪️ .ai <text>
-┃   ▪️ .system
-┃   ▪️ .owner
-╰─╼━━━━━━━━━━━━━━━━━━╾─╯
+╭─「 🛠️ ꜱᴛᴀᴛᴜꜱ ᴅᴇᴛᴀɪʟꜱ 」 
+│🤖 *Bot*: MAHII-MD-V2
+│🙋‍♂️ *User*: ${user}
+│📱 *Owner*: ${owner}
+│⏳ *Uptime*: ${uptime}
+│💾 *Ram*: ${used_ram} / ${total_ram}
+│🛎️ *Prefix*: .
+╰──────────●●►
 
-╭─╼━━━━━━━━━━━━━━━━━━╾─╮
-┃ 📥 *DOWNLOAD COMMANDS* 📥
-┃   ▪️ .song <text>
-┃   ▪️ .video <text>
-┃   ▪️ .fb <link>
-╰─╼━━━━━━━━━━━━━━━━━━╾─╯
+╭─「 📜 ᴍᴇɴᴜ ᴏᴘᴛɪᴏɴꜱ 」 
+│ ⚙️ *MAIN COMMANDS*
+│   ➥ .alive 
+│   ➥ .menu 
+│   ➥ .ai <text> 
+│   ➥ .system 
+│   ➥ .owner 
+│
+│ 📥 *DOWNLOAD COMMANDS*
+│   ➥ .song <text> 
+│   ➥ .video <text> 
+│   ➥ .fb <link> 
+│
+│ 👑 *OWNER COMMANDS*
+│   ➥ .restart 
+│   ➥ .update 
+│
+│ 🔁 *CONVERT COMMANDS*
+│   ➥ .sticker <reply img> 
+│   ➥ .img <reply sticker> 
+│   ➥ .tr <lang> <text>
+│   ➥ .tts <text> 
+╰──────────●●►
 
-╭─╼━━━━━━━━━━━━━━━━━━╾─╮
-┃ 👑 *OWNER COMMANDS* 👑
-┃   ▪️ .restart
-┃   ▪️ .update
-╰─╼━━━━━━━━━━━━━━━━━━╾─╯
+*POWERED BY MAHII-MD*
 
-╭─╼━━━━━━━━━━━━━━━━━━╾─╮
-┃ 🔁 *CONVERT COMMANDS* 🔁
-┃   ▪️ .sticker <reply img>
-┃   ▪️ .img <reply sticker>
-┃   ▪️ .tr <lang> <text>
-┃   ▪️ .tts <text>
-╰─╼━━━━━━━━━━━━━━━━━━╾─╯
-
-⛧━━━━━━[ MADE BY MIHIRANGA ]━━━━━━⛧`;
+`;
 
       await robin.sendMessage(
         from,
