@@ -1,8 +1,7 @@
 const { cmd } = require("../command");
-const { downloadMediaMessage } = require("../lib/msg.js"); // adjust path
+const { downloadMediaMessage } = require("../lib/msg.js");
 
-// Simple database to store statuses (in-memory, for now)
-let savedStatuses = {};
+let savedStatuses = {}; // { saverId: { media, uploaderId } }
 
 cmd(
   {
@@ -21,8 +20,9 @@ cmd(
       const media = await downloadMediaMessage(quoted, "savedStatus");
       if (!media) return reply("Failed to download status.");
 
-      // Save media in memory using sender ID as key
-      savedStatuses[sender] = media;
+      const uploader = quoted.sender; // Status දාපු කෙනාගේ ID
+      savedStatuses[sender] = { media, uploader };
+
       reply("✅ Status saved successfully!");
     } catch (e) {
       console.error(e);
@@ -35,23 +35,35 @@ cmd(
   {
     pattern: "send",
     react: "📤",
-    desc: "Send your saved status",
+    desc: "Send saved status to uploader and sender",
     category: "status",
     filename: __filename,
   },
-  async (robin, mek, m, { sender, reply, from }) => {
+  async (robin, mek, m, { sender, reply }) => {
     try {
-      const media = savedStatuses[sender];
-      if (!media) return reply("❌ You haven't saved any status yet.");
+      const saved = savedStatuses[sender];
+      if (!saved) return reply("❌ You haven't saved any status yet.");
 
-      // Detect media type and send appropriately
-      if (media.mimetype.startsWith("image/")) {
-        await robin.sendMessage(from, { image: media }, { quoted: mek });
-      } else if (media.mimetype.startsWith("video/")) {
-        await robin.sendMessage(from, { video: media }, { quoted: mek });
-      } else {
-        reply("Unknown media type.");
-      }
+      const { media, uploader } = saved;
+      if (!uploader) return reply("Uploader information missing.");
+
+      const sendMedia = async (jid, caption) => {
+        if (media.mimetype.startsWith("image/")) {
+          await robin.sendMessage(jid, { image: media, caption });
+        } else if (media.mimetype.startsWith("video/")) {
+          await robin.sendMessage(jid, { video: media, caption });
+        } else {
+          throw new Error("Unknown media type.");
+        }
+      };
+
+      // 1. Send to uploader
+      await sendMedia(uploader, "💌 Your status was saved and sent!");
+      
+      // 2. Send to command user (sender)
+      await sendMedia(sender, "💾 Here is the saved status you requested!");
+
+      reply("✅ Status sent to both uploader and you!");
     } catch (e) {
       console.error(e);
       reply(`Error: ${e.message || e}`);
@@ -59,28 +71,38 @@ cmd(
   }
 );
 
-// Aliases (ewanna, danna, dapan)
+// Aliases
 ["ewanna", "danna", "dapan"].forEach((cmdName) => {
   cmd(
     {
       pattern: cmdName,
       react: "🚀",
-      desc: `Send your saved status (${cmdName})`,
+      desc: `Send saved status to uploader and sender (${cmdName})`,
       category: "status",
       filename: __filename,
     },
-    async (robin, mek, m, { sender, reply, from }) => {
+    async (robin, mek, m, { sender, reply }) => {
       try {
-        const media = savedStatuses[sender];
-        if (!media) return reply("❌ You haven't saved any status yet.");
+        const saved = savedStatuses[sender];
+        if (!saved) return reply("❌ You haven't saved any status yet.");
 
-        if (media.mimetype.startsWith("image/")) {
-          await robin.sendMessage(from, { image: media }, { quoted: mek });
-        } else if (media.mimetype.startsWith("video/")) {
-          await robin.sendMessage(from, { video: media }, { quoted: mek });
-        } else {
-          reply("Unknown media type.");
-        }
+        const { media, uploader } = saved;
+        if (!uploader) return reply("Uploader information missing.");
+
+        const sendMedia = async (jid, caption) => {
+          if (media.mimetype.startsWith("image/")) {
+            await robin.sendMessage(jid, { image: media, caption });
+          } else if (media.mimetype.startsWith("video/")) {
+            await robin.sendMessage(jid, { video: media, caption });
+          } else {
+            throw new Error("Unknown media type.");
+          }
+        };
+
+        await sendMedia(uploader, "💌 Your status was saved and sent!");
+        await sendMedia(sender, "💾 Here is the saved status you requested!");
+
+        reply("✅ Status sent to both uploader and you!");
       } catch (e) {
         console.error(e);
         reply(`Error: ${e.message || e}`);
