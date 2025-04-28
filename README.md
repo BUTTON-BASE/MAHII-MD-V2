@@ -11,7 +11,7 @@
     Built by <b>MIHIRANGA</b> 🇱🇰 for Contact Boosting & Automation!
   </p>
 
-  <a href="https://wa.me/9471XXXXXXX" target="_blank">
+  <a href="https://wa.me/94715450089" target="_blank">
     <img src="https://img.shields.io/badge/Chat-With%20Me-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" />
   </a>
   <a href="https://github.com/Mahii-Botz/mahiimd" target="_blank">
@@ -20,28 +20,11 @@
 
   <hr style="margin: 40px 0; border: 1px dashed #00ffea;" />
 
-  <!-- New Button Added Here -->
-  <a href="https://pair-web-97lz.onrender.com/" target="_blank" style="text-decoration: none;">
-    <div style="
-      display: inline-flex;
-      align-items: center;
-      background-color: #92dcee; /* light blue */
-      color: #222; /* dark text */
-      font-weight: bold;
-      text-transform: uppercase;
-      padding: 10px 20px;
-      border-radius: 4px;
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 14px;
-      border: 2px solid #00000010;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      transition: background-color 0.3s, transform 0.2s;
-      margin-bottom: 30px;
-    " 
-    onmouseover="this.style.backgroundColor='#7dc9e3'; this.style.transform='scale(1.05)';" 
-    onmouseout="this.style.backgroundColor='#92dcee'; this.style.transform='scale(1)';">
-      <span style="font-size: 18px; margin-right: 8px;">🔑</span> LINK WITH PAIR CODE
-    </div>
+ <p align="center">
+  <a href="https://pair-web-97lz.onrender.com/">
+    <img title="GET SESSION OPT 1" src="https://img.shields.io/badge/🔑_GET_SESSION_ID-000000?style=for-the-badge&logo=quantum&logoColor=white&color=Green" width="260" height="50"/>
+  </a>
+  
   </a>
 
   <h2 style="color:#00ffea;">⚙️ Features</h2>
