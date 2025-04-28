@@ -20,6 +20,30 @@
 
   <hr style="margin: 40px 0; border: 1px dashed #00ffea;" />
 
+  <!-- New Button Added Here -->
+  <a href="https://pair-web-97lz.onrender.com/" target="_blank" style="text-decoration: none;">
+    <div style="
+      display: inline-flex;
+      align-items: center;
+      background-color: #92dcee; /* light blue */
+      color: #222; /* dark text */
+      font-weight: bold;
+      text-transform: uppercase;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 14px;
+      border: 2px solid #00000010;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: background-color 0.3s, transform 0.2s;
+      margin-bottom: 30px;
+    " 
+    onmouseover="this.style.backgroundColor='#7dc9e3'; this.style.transform='scale(1.05)';" 
+    onmouseout="this.style.backgroundColor='#92dcee'; this.style.transform='scale(1)';">
+      <span style="font-size: 18px; margin-right: 8px;">🔑</span> LINK WITH PAIR CODE
+    </div>
+  </a>
+
   <h2 style="color:#00ffea;">⚙️ Features</h2>
   <ul style="color: #eeeeee; font-size: 16px; text-align: left; max-width: 600px;">
     <li>✅ Auto Status React</li>
@@ -34,4 +58,3 @@
   <p style="font-size: 14px; color:#888888;">Made with 💙 by <strong>MIHIRANGA</strong> | 🇱🇰 Sri Lanka</p>
 
 </div>
-
