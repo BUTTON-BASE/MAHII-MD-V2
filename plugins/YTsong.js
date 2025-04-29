@@ -10,19 +10,7 @@ cmd(
     category: "download",
     filename: __filename,
   },
-  async (
-    robin,
-    mek,
-    m,
-    {
-      from,
-      quoted,
-      body,
-      args,
-      q,
-      reply,
-    }
-  ) => {
+  async (robin, mek, m, { from, quoted, q, reply }) => {
     try {
       if (!q) return reply("*Please provide a YouTube link or song name* ❤️");
 
@@ -41,81 +29,68 @@ cmd(
 📝 *Description:* ${data.description}
 
 
-⏱️ *Uploaded:* ${data.timestamp} (${data.ago} ago)
+⏱️ *Uploaded:* ${data.timestamp} (${data.ago})
 
 
 👀 *Views:* ${data.views}
 
-🔗 *Download URL:* 
-${data.url}
+
+🔗 *Link:* ${data.url}
 
 ━━━━━━━━━━━━━━━━━━
-🔘 *What file type do you want? Please reply to this message.*
-
-1. *mp3 file*
-2. *document file*
+🔘 *Choose format:*
+Reply with *1* for mp3
+Reply with *2* for document
 
 🛠️ Made by *MIHIRANGA*
 `;
 
-      const sent = await robin.sendMessage(
-        from,
-        {
-          image: { url: data.thumbnail },
-          caption: desc,
-        },
-        { quoted: mek }
-      );
+      await robin.sendMessage(from, {
+        image: { url: data.thumbnail },
+        caption: desc.trim(),
+      }, { quoted: mek });
 
-      // Wait for a reply to the above message
-      const incoming = await robin.waitForMessage(
-        (msg) =>
-          msg.key.fromMe === false &&
-          msg.message &&
-          msg.message.conversation &&
-          msg.message.conversation.match(/^[1-2]$/) &&
-          msg.message?.extendedTextMessage?.contextInfo?.stanzaId === sent.key.id,
-        60000 // 60 seconds timeout
-      );
+      // Add a listener for response
+      robin.ev.once("messages.upsert", async ({ messages }) => {
+        try {
+          const incoming = messages[0];
+          if (!incoming.message || !incoming.message.conversation) return;
+          const choice = incoming.message.conversation.trim();
 
-      const choice = incoming.message.conversation.trim();
+          const durationParts = data.timestamp.split(":").map(Number);
+          const totalSeconds =
+            durationParts.length === 3
+              ? durationParts[0] * 3600 + durationParts[1] * 60 + durationParts[2]
+              : durationParts[0] * 60 + durationParts[1];
 
-      const quality = "128";
-      const songData = await ytmp3(url, quality);
+          if (totalSeconds > 1800) return reply("⏱️ Audio limit is 30 minutes.");
 
-      const durationParts = data.timestamp.split(":").map(Number);
-      const totalSeconds =
-        durationParts.length === 3
-          ? durationParts[0] * 3600 + durationParts[1] * 60 + durationParts[2]
-          : durationParts[0] * 60 + durationParts[1];
+          const songData = await ytmp3(url, "128");
 
-      if (totalSeconds > 1800) return reply("⏱️ Audio limit is 30 minutes.");
+          if (choice === "1") {
+            await robin.sendMessage(from, {
+              audio: { url: songData.download.url },
+              mimetype: "audio/mpeg",
+            }, { quoted: incoming });
+          } else if (choice === "2") {
+            await robin.sendMessage(from, {
+              document: { url: songData.download.url },
+              mimetype: "audio/mpeg",
+              fileName: `${data.title}.mp3`,
+              caption: "𝐌𝐚𝐝𝐞 𝐛𝐲 *MIHIRANGA*",
+            }, { quoted: incoming });
+          } else {
+            return reply("❌ Invalid option selected.");
+          }
 
-      if (choice === "1") {
-        await robin.sendMessage(
-          from,
-          {
-            audio: { url: songData.download.url },
-            mimetype: "audio/mpeg",
-          },
-          { quoted: incoming }
-        );
-      } else if (choice === "2") {
-        await robin.sendMessage(
-          from,
-          {
-            document: { url: songData.download.url },
-            mimetype: "audio/mpeg",
-            fileName: `${data.title}.mp3`,
-            caption: "𝐌𝐚𝐝𝐞 𝐛𝐲 *MIHIRANGA*",
-          },
-          { quoted: incoming }
-        );
-      } else {
-        return reply("❌ Invalid option selected.");
-      }
+          await reply("*✅ Sent successfully. Enjoy!* 🎶");
 
-      await reply("*✅ Sent successfully. Enjoy!* 🎶");
+        } catch (err) {
+          console.log(err);
+          reply(`❌ Error: ${err.message}`);
+        }
+      });
+
     } catch (e) {
       console.log(e);
       reply(`❌ Error: ${e.message}`);
