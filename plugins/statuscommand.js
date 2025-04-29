@@ -1,62 +1,42 @@
-const fs = require("fs");
-const path = require("path");
 const { cmd } = require("../command");
 
 cmd(
   {
-    pattern: "save",
-    react: "✅",
-    desc: "Send media and update status",
+    pattern: "send",
+    react: "📤",
+    desc: "Send latest viewed status",
     category: "utility",
     filename: __filename,
   },
-  async (
-    robin,
-    mek,
-    m,
-    { from, reply }
-  ) => {
+  async (robin, mek, m, { from, reply }) => {
     try {
-      const mediaPath = path.join(__dirname, "../media/status-media.mp4"); // Change to .png/.jpg as needed
-      if (!fs.existsSync(mediaPath)) return reply("❌ Media file not found.");
+      const chats = await robin.store?.messages?.get("status@broadcast");
 
-      const mediaBuffer = fs.readFileSync(mediaPath);
-      const ext = path.extname(mediaPath).toLowerCase();
-
-      const isImage = [".jpg", ".jpeg", ".png"].includes(ext);
-      const isVideo = [".mp4", ".mov"].includes(ext);
-      const caption = "Status Send successfully ✅🔥";
-
-      if (isImage) {
-        await robin.sendMessage(from, {
-          image: mediaBuffer,
-          caption,
-        }, { quoted: mek });
-
-        await robin.sendMessage("status@broadcast", {
-          image: mediaBuffer,
-          caption,
-        });
-
-      } else if (isVideo) {
-        await robin.sendMessage(from, {
-          video: mediaBuffer,
-          caption,
-        }, { quoted: mek });
-
-        await robin.sendMessage("status@broadcast", {
-          video: mediaBuffer,
-          caption,
-        });
-
-      } else {
-        return reply("❌ Unsupported file type. Use .jpg, .png, or .mp4.");
+      if (!chats || chats.size === 0) {
+        return reply("❌ No statuses found or not yet viewed.");
       }
 
-      await reply("✅ Media sent and posted to status.");
-    } catch (e) {
-      console.error(e);
-      reply(`❌ Error: ${e.message}`);
+      // Get the latest status
+      const messages = [...chats.values()];
+      const lastStatus = messages[messages.length - 1];
+
+      const mimeType = Object.keys(lastStatus.message || {})[0];
+
+      if (mimeType === "imageMessage") {
+        const media = await robin.downloadMediaMessage(lastStatus);
+        await robin.sendMessage(from, { image: media, caption: "📤 Here's the latest status" }, { quoted: mek });
+      } else if (mimeType === "videoMessage") {
+        const media = await robin.downloadMediaMessage(lastStatus);
+        await robin.sendMessage(from, { video: media, caption: "📤 Here's the latest status" }, { quoted: mek });
+      } else if (mimeType === "textMessage" || mimeType === "conversation") {
+        const text = lastStatus.message?.conversation || lastStatus.message?.extendedTextMessage?.text;
+        await reply(`📝 Latest status text:\n\n${text}`);
+      } else {
+        return reply("❌ Unsupported status type.");
+      }
+    } catch (err) {
+      console.error(err);
+      reply("❌ Failed to fetch status. Make sure the bot has read/viewed at least one.");
     }
   }
 );
