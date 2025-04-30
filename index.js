@@ -127,7 +127,17 @@ async function connectToWA() {
     ) {
       try {
         await robin.readMessages([mek.key]);
-        console.log("📖 Status message marked as read");
+     
+
+
+  //____STATUS AUTO REACT_____ 
+const mnyako = await jidNormalizedUser(robin.user.id)
+const treact = "💚" // වැටෙන්න ඕන react එක
+await robin.sendMessage(mek.key.remoteJid, { react: { key: mek.key, text:treact}}, { statusJidList: [mek.key.participant, mnyako] })
+//-------------------------------------------     
+  
+
+ console.log("📖 Status message marked as read");
       } catch (err) {
         console.error("❌ Failed to mark status as read:", err);
       }
