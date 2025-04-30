@@ -4,7 +4,7 @@ const config = require('../config')
 const {cmd , commands} = require('../command')
 
 //auto_voice
-cmd({
+/*cmd({
   on: "body"
 },    
 async (robin, mek, m, { from, body, isOwner }) => {
@@ -57,4 +57,4 @@ async (robin, mek, m, { from, body, isOwner }) => {
             }
         }
     }                
-});                  
+});             */     
