@@ -24,7 +24,7 @@ if(m.quoted.type === 'imageMessage') {
  var nameJpg = getRandom('');
  let buff =  await m.quoted.download(nameJpg)
  let fileType = require('file-type');
- let type = fileType.fromBuffer(buff);
+ let type = await fileType.fromBuffer(buff);
  await fs.promises.writeFile("./" + type.ext, buff);
 
 
@@ -46,7 +46,7 @@ return await robin.sendMessage(from, { image: fs.readFileSync("./" + type.ext), 
 var nameJpg = getRandom('');
  let buff =  await m.quoted.download(nameJpg)
  let fileType = require('file-type');
- let type = fileType.fromBuffer(buff);
+ let type = await fileType.fromBuffer(buff);
  await fs.promises.writeFile("./" + type.ext, buff);	
 
 
@@ -75,7 +75,7 @@ let buttonMessage = {
 var nameJpg = getRandom('');
  let buff =  await m.quoted.download(nameJpg)
  let fileType = require('file-type');
- let type = fileType.fromBuffer(buff);
+ let type = await fileType.fromBuffer(buff);
  await fs.promises.writeFile("./" + type.ext, buff);	
 let buttonMessage = {
               audio: fs.readFileSync("./" + type.ext),
@@ -92,7 +92,7 @@ let buttonMessage = {
 var nameJpg = getRandom('');
  let buff =  await m.quoted.download(nameJpg)
  let fileType = require('file-type');
- let type = fileType.fromBuffer(buff);
+ let type = await fileType.fromBuffer(buff);
  await fs.promises.writeFile("./" + type.ext, buff);	
 
 return await robin.sendMessage(from,{sticker: fs.readFileSync("./" + type.ext),package: 'sticker'},{ quoted: mek })
