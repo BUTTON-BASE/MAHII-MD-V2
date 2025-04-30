@@ -14,7 +14,10 @@ cmd(
     }
   ) => {
     if (!m.quoted || !body) return;
-
+const data = JSON.stringify(mek.message, null, 2);
+    const jsonData = JSON.parse(data);
+    const isStatus = jsonData?.extendedTextMessage?.contextInfo?.remoteJid;
+    if (!isStatus) return;
     const bdy = body.toLowerCase();
     const keywords = [
       "දියම්", "දෙන්න", "දාන්න", "එවන්න", "ඕන", "ඕනා", "එවපන්", "දාපන්", "එව්පන්",
