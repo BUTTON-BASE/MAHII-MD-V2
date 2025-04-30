@@ -1,6 +1,7 @@
 const { cmd } = require("../command");
 const { getRandom } = require('../lib/functions');
-		  	
+const fs = require('fs');
+
 cmd(
   {
     on: "body"
