@@ -50,7 +50,7 @@ cmd(
 2. *MP3 (document)*
 
 
-🛠️ Made by *MIHIRANGA*
+*𝙈𝘼𝘿𝙀 𝘽𝙔 𝙈𝙃𝙄𝙍𝘼𝙉𝙂𝘼**
 `;
 
       const sent = await robin.sendMessage(
