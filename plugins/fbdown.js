@@ -1,4 +1,3 @@
-plugins/fbdown.js
 const { cmd } = require("../command");
 const axios = require("axios");
 
@@ -30,12 +29,13 @@ cmd(
         from,
         {
           video: { url: videoUrl },
-          caption: `📘 *${title || "Facebook Video"}*\n\n𝙈𝘼𝙃𝙄𝙄 𝙈𝘿 𝙁𝘽 𝘿𝙊𝙒𝙉𝙇𝙊𝘿𝙀𝙍`,
+          caption: `📘 *${title || "Facebook Video"}*\n\n_*𝙈𝘼𝙃𝙄𝙄-𝙈𝘿 𝙁𝘽 𝘿𝙊𝙒𝙉𝙇𝙊𝘿𝙀𝙍*_`,
         },
         { quoted: mek }
       );
     } catch (e) {
       console.error(e);
       reply(`❌ *Failed to download:* ${e.message}`);
-
-    }})
+    }
+  }
+);
