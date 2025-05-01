@@ -10,7 +10,7 @@ cmd(
     category: "download",
     filename: __filename,
   },
-  async (robin, mek, m, { from, quoted, q, reply, isCreator }) => {
+  async (robin, mek, m, { from, quoted, q, reply }) => {
     try {
       if (!q) return reply("*Please provide a YouTube link or song name* ❤️");
 
@@ -24,13 +24,9 @@ cmd(
 ╰──────────────⬣
 
 📌 *Title:* ${data.title}
-
 📝 *Description:* ${data.description}
-
 ⏱️ *Uploaded:* ${data.timestamp} (${data.ago})
-
 👀 *Views:* ${data.views}
-
 🔗 *Link:* ${data.url}
 
 ━━━━━━━━━━━━━━━━━━
@@ -46,22 +42,27 @@ Reply with *2* for document
         caption: desc.trim(),
       }, { quoted: mek });
 
-      const filter = (msg) => msg.key.remoteJid === from && msg.message?.conversation?.trim();
-      const collector = robin.ev.on("messages.upsert", async ({ messages }) => {
-        const msg = messages?.[0];
-        if (!msg || !msg.message) return;
-
-        const choice = msg.message.conversation.trim();
-        if (!["1", "2"].includes(choice)) return reply("❌ Invalid option. Use *1* or *2*.");
-
-        const durationParts = data.timestamp.split(":").map(Number);
-        const totalSeconds = durationParts.length === 3
-          ? durationParts[0] * 3600 + durationParts[1] * 60 + durationParts[2]
-          : durationParts[0] * 60 + durationParts[1];
-
-        if (totalSeconds > 1800) return reply("⏱️ Audio limit is 30 minutes.");
-
+      // Create a named function so we can remove it properly later
+      const onMessage = async (event) => {
         try {
+          const msg = event?.messages?.[0];
+          if (!msg || msg.key.remoteJid !== from || !msg.message?.conversation) return;
+
+          const choice = msg.message.conversation.trim();
+          if (!["1", "2"].includes(choice)) {
+            await reply("❌ Invalid option. Use *1* or *2*.");
+            return;
+          }
+
+          // Duration check
+          const durationParts = data.timestamp.split(":").map(Number);
+          const totalSeconds =
+            durationParts.length === 3
+              ? durationParts[0] * 3600 + durationParts[1] * 60 + durationParts[2]
+              : durationParts[0] * 60 + durationParts[1];
+
+          if (totalSeconds > 1800) return reply("⏱️ Audio limit is 30 minutes.");
+
           const songData = await ytmp3(url, "128");
 
           if (choice === "1") {
@@ -69,7 +70,7 @@ Reply with *2* for document
               audio: { url: songData.download.url },
               mimetype: "audio/mpeg",
             }, { quoted: msg });
-          } else if (choice === "2") {
+          } else {
             await robin.sendMessage(from, {
               document: { url: songData.download.url },
               mimetype: "audio/mpeg",
@@ -79,18 +80,18 @@ Reply with *2* for document
           }
 
           await reply("*✅ Sent successfully. Enjoy!* 🎶");
-
         } catch (err) {
-          console.log(err);
-          reply(`❌ Error while downloading: ${err.message}`);
+          console.error("Error in format selection:", err);
+          await reply(`❌ Error: ${err.message}`);
+        } finally {
+          robin.ev.off("messages.upsert", onMessage); // remove listener
         }
+      };
 
-        robin.ev.off("messages.upsert", collector); // Stop listening after response
-      });
-
-    } catch (e) {
-      console.log(e);
-      reply(`❌ Error: ${e.message}`);
+      robin.ev.on("messages.upsert", onMessage);
+    } catch (err) {
+      console.error("Main error:", err);
+      reply(`❌ Error: ${err.message}`);
     }
   }
 );
