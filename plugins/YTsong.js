@@ -1,6 +1,6 @@
 const { cmd } = require("../command");
 const yts = require("yt-search");
-const { ytmp3 } = require("@vreden/youtube_scraper");
+const dylux = require("api-dylux");
 
 cmd(
   {
@@ -10,19 +10,7 @@ cmd(
     category: "download",
     filename: __filename,
   },
-  async (
-    robin,
-    mek,
-    m,
-    {
-      from,
-      quoted,
-      body,
-      args,
-      q,
-      reply,
-    }
-  ) => {
+  async (robin, mek, m, { from, q, reply }) => {
     try {
       if (!q) return reply("*Please provide a YouTube link or song name* ❤️");
 
@@ -45,12 +33,12 @@ cmd(
 
 🔗 *Link:* ${url}
 
-📤 *Choose the file type to download:*
+📤 *Choose file type:*
+
 1. *MP3 (audio)*
 2. *MP3 (document)*
 
-
-*𝙈𝘼𝘿𝙀 𝘽𝙔 𝙈𝙃𝙄𝙍𝘼𝙉𝙂𝘼**
+*𝙈𝘼𝘿𝙀 𝘽𝙔 𝙈𝙄𝙃𝙄𝙍𝘼𝙉𝙂𝘼*
 `;
 
       const sent = await robin.sendMessage(
@@ -62,29 +50,22 @@ cmd(
         { quoted: mek }
       );
 
-      // Wait for a reply
+      // Wait for number reply (1 or 2)
       const incoming = await robin.waitForMessage(
         (msg) =>
           msg.key.fromMe === false &&
-          msg.message &&
-          msg.message.conversation &&
-          msg.message.conversation.match(/^[1-2]$/),
-        60000 // 60 seconds timeout
+          msg.message?.conversation?.match(/^[1-2]$/),
+        60000
       );
 
       const choice = incoming.message.conversation.trim();
-      const quality = "128";
-      const songData = await ytmp3(url, quality);
 
-      const durationParts = data.timestamp.split(":").map(Number);
-      const totalSeconds =
-        durationParts.length === 3
-          ? durationParts[0] * 3600 + durationParts[1] * 60 + durationParts[2]
-          : durationParts[0] * 60 + durationParts[1];
+      // Download MP3 using api-dylux
+      const result = await dylux.ytmp3(url);
+      if (!result || !result.dl_link) return reply("❌ Failed to download audio.");
 
-      if (totalSeconds > 1800) return reply("⏱️ Audio limit is 30 minutes.");
+      const filename = `${data.title}.mp3`;
 
-      // React based on user choice
       if (choice === "1") {
         await robin.sendMessage(from, {
           react: { text: "🎵", key: incoming.key },
@@ -93,7 +74,7 @@ cmd(
         await robin.sendMessage(
           from,
           {
-            audio: { url: songData.download.url },
+            audio: { url: result.dl_link },
             mimetype: "audio/mpeg",
           },
           { quoted: incoming }
@@ -106,20 +87,20 @@ cmd(
         await robin.sendMessage(
           from,
           {
-            document: { url: songData.download.url },
+            document: { url: result.dl_link },
             mimetype: "audio/mpeg",
-            fileName: `${data.title}.mp3`,
+            fileName: filename,
             caption: "𝐌𝐚𝐝𝐞 𝐛𝐲 *MIHIRANGA*",
           },
           { quoted: incoming }
         );
       } else {
-        return reply("❌ Invalid option selected.");
+        return reply("❌ Invalid choice.");
       }
 
       await reply("*✅ Sent successfully. Enjoy!* 🎶");
     } catch (e) {
-      console.log(e);
+      console.error(e);
       reply(`❌ Error: ${e.message}`);
     }
   }
