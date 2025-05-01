@@ -1,5 +1,4 @@
-// plugins/song.js
-const { cmd } = require("../command");
+const { cmd, commands } = require("../command");
 const yts = require("yt-search");
 const { ytmp3 } = require("@vreden/youtube_scraper");
 
@@ -7,90 +6,89 @@ cmd(
   {
     pattern: "song",
     react: "🎵",
-    desc: "Download Song (audio or document)",
+    desc: "Download Song",
     category: "download",
     filename: __filename,
   },
-  async (robin, mek, m, { from, quoted, q, reply }) => {
+  async (
+    robin,
+    mek,
+    m,
+    {
+      from,
+      quoted,
+      body,
+      isCmd,
+      command,
+      args,
+      q,
+      isGroup,
+      sender,
+      senderNumber,
+      botNumber2,
+      botNumber,
+      pushname,
+      isMe,
+      isOwner,
+      groupMetadata,
+      groupName,
+      participants,
+      groupAdmins,
+      isBotAdmins,
+      isAdmins,
+      reply,
+    }
+  ) => {
     try {
-      if (!q) return reply("❌ Please provide a song name or YouTube link.");
+      if (!q) return reply("*Please provide link or song name* 🌚❤️");
 
+      // Search for the video
       const search = await yts(q);
       const data = search.videos[0];
-      if (!data) return reply("❌ No video found for that query.");
       const url = data.url;
 
-      const prompt = `
+      // Song metadata description
+      let desc = `
 ╭───────⬣
 │  🧩 *MAHII-MD DOWNLOADER* 🧩
 ╰──────────────⬣
 
-🎶 *Title:* ${data.title}
+🎶 *Song Title:* ${data.title}
+
 ⏱️ *Duration:* ${data.timestamp}
+
+📅 *Uploaded:* ${data.ago}
+
 👁️ *Views:* ${data.views}
 
 🔗 *Link:* ${url}
 
-📤 *Choose file type:*
-1. *MP3 (audio)*
-2. *MP3 (document)*
-
-*Reply with 1 or 2*
-
-𝙈𝘼𝘿𝙀 𝘽𝙔 𝙈𝙄𝙃𝙄𝙍𝘼𝙉𝙂𝘼
+*𝙈𝘼𝘿𝙀 𝘽𝙔 𝙈𝙄𝙃𝙄𝙍𝘼𝙉𝙂𝘼*
 `;
 
-      const sent = await robin.sendMessage(
+      // Send metadata thumbnail message
+      await robin.sendMessage(
         from,
-        { image: { url: data.thumbnail }, caption: prompt },
+        { image: { url: data.thumbnail }, caption: desc },
         { quoted: mek }
       );
 
-      const incoming = await waitForMessage(
-        robin,
-        (msg) =>
-          !msg.key.fromMe &&
-          msg.key.remoteJid === from &&
-          msg.message?.conversation?.trim().match(/^[1-2]$/),
-        60000
-      );
-      const choice = incoming.message.conversation.trim();
+      // Download the audio using @vreden/youtube_scraper
+      const quality = "128"; // Default quality
+      const songData = await ytmp3(url, quality);
 
-      // ✅ React to user's reply
-      await robin.sendMessage(from, {
-        react: {
-          text: choice === "1" ? "🎧" : "📩",
-          key: incoming.key,
-        },
-      });
+      // Validate song duration (limit: 30 minutes)
+      let durationParts = data.timestamp.split(":").map(Number);
+      let totalSeconds =
+        durationParts.length === 3
+          ? durationParts[0] * 3600 + durationParts[1] * 60 + durationParts[2]
+          : durationParts[0] * 60 + durationParts[1];
 
-      const timeout = (ms) =>
-        new Promise((_, rej) => setTimeout(() => rej(new Error("Timed Out")), ms));
-      const songData = await Promise.race([ytmp3(url, "128"), timeout(20000)]);
-
-      if (!songData?.download?.url) {
-        return reply("❌ Failed to retrieve audio. Please try again later.");
+      if (totalSeconds > 1800) {
+        return reply("⏱️ audio limit is 30 minitues");
       }
 
-      const parts = data.timestamp.split(":").map(Number);
-      const seconds =
-        parts.length === 3
-          ? parts[0] * 3600 + parts[1] * 60 + parts[2]
-          : parts[0] * 60 + parts[1];
-      if (seconds > 1800) return reply("⏱️ Audio limit is 30 minutes.");
-
-      await handleDownload(choice, from, songData, mek, reply, data, robin);
-    } catch (e) {
-      console.error(e);
-      reply(`❌ Error: ${e.message}`);
-    }
-  }
-);
-
-// ✅ Updated to include `robin` in download function
-async function handleDownload(choice, from, songData, mek, reply, data, robin) {
-  try {
-    if (choice === "1") {
+      // Send audio file
       await robin.sendMessage(
         from,
         {
@@ -99,50 +97,12 @@ async function handleDownload(choice, from, songData, mek, reply, data, robin) {
         },
         { quoted: mek }
       );
-    }
 
-    if (choice === "2") {
-      await robin.sendMessage(
-        from,
-        {
-          document: { url: songData.download.url },
-          mimetype: "audio/mpeg",
-          fileName: `${data.title}.mp3`,
-          caption: "*𝙈𝘼𝘿𝙀 𝘽𝙔 𝙈𝙄𝙃𝙄𝙍𝘼𝙉𝙂𝘼*",
-        },
-        { quoted: mek }
-      );
+     
+      return reply("*Thanks for using my bot* ❤️");
+    } catch (e) {
+      console.log(e);
+      reply(`❌ Error: ${e.message}`);
     }
-
-    await reply("✅ Download sent! Enjoy your music 🎶");
-  } catch (e) {
-    console.error(e);
-    if (e.message === "Timed Out") {
-      return reply("⏳ You took too long to reply. Please run the command again.");
-    }
-    reply(`❌ Error: ${e.message}`);
   }
-}
-
-// 🔁 Helper: waitForMessage
-function waitForMessage(sock, check, timeoutMs = 60000) {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      sock.ev.off("messages.upsert", onMsg);
-      reject(new Error("Timed Out"));
-    }, timeoutMs);
-
-    function onMsg({ messages }) {
-      for (const msg of messages) {
-        if (check(msg)) {
-          clearTimeout(timeout);
-          sock.ev.off("messages.upsert", onMsg);
-          resolve(msg);
-          break;
-        }
-      }
-    }
-
-    sock.ev.on("messages.upsert", onMsg);
-  });
-}
+);
