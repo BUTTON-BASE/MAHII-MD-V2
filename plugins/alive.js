@@ -57,4 +57,4 @@ cmd(
       console.error("❌ Error in .alive command:", e);
       reply("❌ Error while sending alive message!");
     }
-          }
+          })
