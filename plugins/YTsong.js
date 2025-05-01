@@ -10,7 +10,19 @@ cmd(
     category: "download",
     filename: __filename,
   },
-  async (robin, mek, m, { from, quoted, q, reply }) => {
+  async (
+    robin,
+    mek,
+    m,
+    {
+      from,
+      quoted,
+      body,
+      args,
+      q,
+      reply,
+    }
+  ) => {
     try {
       if (!q) return reply("*Please provide a YouTube link or song name* ❤️");
 
@@ -23,75 +35,92 @@ cmd(
 │  🧩 *MAHII-MD DOWNLOADER* 🧩
 ╰──────────────⬣
 
-📌 *Title:* ${data.title}
-📝 *Description:* ${data.description}
-⏱️ *Uploaded:* ${data.timestamp} (${data.ago})
-👀 *Views:* ${data.views}
-🔗 *Link:* ${data.url}
+🎶 *Song Title:* ${data.title}
 
-━━━━━━━━━━━━━━━━━━
-🔘 *Choose format:*
-Reply with *1* for mp3
-Reply with *2* for document
+⏱️ *Duration:* ${data.timestamp}
+
+📅 *Uploaded:* ${data.ago}
+
+👁️ *Views:* ${data.views}
+
+🔗 *Link:* ${url}
+
+📤 *Choose the file type to download:*
+1. *MP3 (audio)*
+2. *MP3 (document)*
+
 
 🛠️ Made by *MIHIRANGA*
 `;
 
-      await robin.sendMessage(from, {
-        image: { url: data.thumbnail },
-        caption: desc.trim(),
-      }, { quoted: mek });
+      const sent = await robin.sendMessage(
+        from,
+        {
+          image: { url: data.thumbnail },
+          caption: desc,
+        },
+        { quoted: mek }
+      );
 
-      // Create a named function so we can remove it properly later
-      const onMessage = async (event) => {
-        try {
-          const msg = event?.messages?.[0];
-          if (!msg || msg.key.remoteJid !== from || !msg.message?.conversation) return;
+      // Wait for a reply
+      const incoming = await robin.waitForMessage(
+        (msg) =>
+          msg.key.fromMe === false &&
+          msg.message &&
+          msg.message.conversation &&
+          msg.message.conversation.match(/^[1-2]$/),
+        60000 // 60 seconds timeout
+      );
 
-          const choice = msg.message.conversation.trim();
-          if (!["1", "2"].includes(choice)) {
-            await reply("❌ Invalid option. Use *1* or *2*.");
-            return;
-          }
+      const choice = incoming.message.conversation.trim();
+      const quality = "128";
+      const songData = await ytmp3(url, quality);
 
-          // Duration check
-          const durationParts = data.timestamp.split(":").map(Number);
-          const totalSeconds =
-            durationParts.length === 3
-              ? durationParts[0] * 3600 + durationParts[1] * 60 + durationParts[2]
-              : durationParts[0] * 60 + durationParts[1];
+      const durationParts = data.timestamp.split(":").map(Number);
+      const totalSeconds =
+        durationParts.length === 3
+          ? durationParts[0] * 3600 + durationParts[1] * 60 + durationParts[2]
+          : durationParts[0] * 60 + durationParts[1];
 
-          if (totalSeconds > 1800) return reply("⏱️ Audio limit is 30 minutes.");
+      if (totalSeconds > 1800) return reply("⏱️ Audio limit is 30 minutes.");
 
-          const songData = await ytmp3(url, "128");
+      // React based on user choice
+      if (choice === "1") {
+        await robin.sendMessage(from, {
+          react: { text: "🎵", key: incoming.key },
+        });
 
-          if (choice === "1") {
-            await robin.sendMessage(from, {
-              audio: { url: songData.download.url },
-              mimetype: "audio/mpeg",
-            }, { quoted: msg });
-          } else {
-            await robin.sendMessage(from, {
-              document: { url: songData.download.url },
-              mimetype: "audio/mpeg",
-              fileName: `${data.title}.mp3`,
-              caption: "𝐌𝐚𝐝𝐞 𝐛𝐲 *MIHIRANGA*",
-            }, { quoted: msg });
-          }
+        await robin.sendMessage(
+          from,
+          {
+            audio: { url: songData.download.url },
+            mimetype: "audio/mpeg",
+          },
+          { quoted: incoming }
+        );
+      } else if (choice === "2") {
+        await robin.sendMessage(from, {
+          react: { text: "📁", key: incoming.key },
+        });
 
-          await reply("*✅ Sent successfully. Enjoy!* 🎶");
-        } catch (err) {
-          console.error("Error in format selection:", err);
-          await reply(`❌ Error: ${err.message}`);
-        } finally {
-          robin.ev.off("messages.upsert", onMessage); // remove listener
-        }
-      };
+        await robin.sendMessage(
+          from,
+          {
+            document: { url: songData.download.url },
+            mimetype: "audio/mpeg",
+            fileName: `${data.title}.mp3`,
+            caption: "𝐌𝐚𝐝𝐞 𝐛𝐲 *MIHIRANGA*",
+          },
+          { quoted: incoming }
+        );
+      } else {
+        return reply("❌ Invalid option selected.");
+      }
 
-      robin.ev.on("messages.upsert", onMessage);
-    } catch (err) {
-      console.error("Main error:", err);
-      reply(`❌ Error: ${err.message}`);
+      await reply("*✅ Sent successfully. Enjoy!* 🎶");
+    } catch (e) {
+      console.log(e);
+      reply(`❌ Error: ${e.message}`);
     }
   }
 );
