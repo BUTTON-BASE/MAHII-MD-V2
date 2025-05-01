@@ -3,6 +3,27 @@ const { cmd } = require("../command");
 const yts = require("yt-search");
 const { ytmp3 } = require("@vreden/youtube_scraper");
 
+// Custom waitForMessage function using Baileys events
+function waitForMessage(sock, filter, timeout = 60000) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      sock.ev.off("messages.upsert", handler);
+      reject(new Error("Timed Out"));
+    }, timeout);
+
+    const handler = (msg) => {
+      const m = msg.messages?.[0];
+      if (filter(m)) {
+        clearTimeout(timer);
+        sock.ev.off("messages.upsert", handler);
+        resolve(m);
+      }
+    };
+
+    sock.ev.on("messages.upsert", handler);
+  });
+}
+
 cmd(
   {
     pattern: "song",
@@ -26,41 +47,41 @@ cmd(
 ╰──────────────⬣
 
 🎶 *Title:* ${data.title}
-
 ⏱️ *Duration:* ${data.timestamp}
-
 👁️ *Views:* ${data.views}
 
 🔗 *Link:* ${url}
 
 📤 *Choose file type:*
-
 1. *MP3 (audio)*
-
 2. *MP3 (document)*
 
 *Reply with 1 or 2*
 
 𝙈𝘼𝘿𝙀 𝘽𝙔 𝙈𝙄𝙃𝙄𝙍𝘼𝙉𝙂𝘼
-
 `;
 
-      const sent = await robin.sendMessage(
+      await robin.sendMessage(
         from,
         { image: { url: data.thumbnail }, caption: prompt },
         { quoted: mek }
       );
 
-      const incoming = await robin.waitForMessage(
+      const incoming = await waitForMessage(
+        robin,
         (msg) =>
           !msg.key.fromMe &&
+          msg.key.remoteJid === from &&
           msg.message?.conversation?.trim().match(/^[1-2]$/),
         60000
       );
+
       const choice = incoming.message.conversation.trim();
 
       const timeout = (ms) =>
-        new Promise((_, rej) => setTimeout(() => rej(new Error("Timed Out")), ms));
+        new Promise((_, rej) =>
+          setTimeout(() => rej(new Error("Timed Out")), ms)
+        );
       const songData = await Promise.race([ytmp3(url, "128"), timeout(20000)]);
 
       if (!songData?.download?.url) {
@@ -68,22 +89,27 @@ cmd(
       }
 
       const parts = data.timestamp.split(":").map(Number);
-      const seconds = parts.length === 3
-        ? parts[0]*3600 + parts[1]*60 + parts[2]
-        : parts[0]*60 + parts[1];
-      if (seconds > 1800) return reply("⏱️ Audio limit is 30 minutes.");
+      const seconds =
+        parts.length === 3
+          ? parts[0] * 3600 + parts[1] * 60 + parts[2]
+          : parts[0] * 60 + parts[1];
+      if (seconds > 1800)
+        return reply("⏱️ Audio limit is 30 minutes.");
 
-      await handleDownload(choice, from, songData, mek, reply, data);
+      await handleDownload(choice, from, songData, mek, reply, data, robin);
 
     } catch (e) {
       console.error(e);
+      if (e.message === "Timed Out") {
+        return reply("⏳ You took too long to reply. Please run the command again.");
+      }
       reply(`❌ Error: ${e.message}`);
     }
   }
 );
 
-// Move this outside the `cmd` call if preferred
-async function handleDownload(choice, from, songData, mek, reply, data) {
+// Updated to pass robin to use sendMessage
+async function handleDownload(choice, from, songData, mek, reply, data, robin) {
   try {
     if (choice === "1") {
       await robin.sendMessage(
@@ -112,9 +138,6 @@ async function handleDownload(choice, from, songData, mek, reply, data) {
     await reply("✅ Download sent! Enjoy your music 🎶");
   } catch (e) {
     console.error(e);
-    if (e.message === "Timed Out") {
-      return reply("⏳ You took too long to reply. Please run the command again.");
-    }
-    reply(`❌ Error: ${e.message}`);
+    reply(`❌ Error while sending file: ${e.message}`);
   }
 }
