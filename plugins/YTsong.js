@@ -1,33 +1,33 @@
+// plugins/song.js
 const { cmd } = require("../command");
 const yts = require("yt-search");
-const dylux = require("api-dylux");
+const { ytmp3 } = require("@vreden/youtube_scraper");
 
 cmd(
   {
     pattern: "song",
     react: "🎵",
-    desc: "Download Song",
+    desc: "Download Song (audio or document)",
     category: "download",
     filename: __filename,
   },
-  async (robin, mek, m, { from, q, reply }) => {
+  async (robin, mek, m, { from, quoted, q, reply }) => {
     try {
-      if (!q) return reply("*Please provide a YouTube link or song name* ❤️");
+      if (!q) return reply("❌ Please provide a song name or YouTube link.");
 
       const search = await yts(q);
       const data = search.videos[0];
+      if (!data) return reply("❌ No video found for that query.");
       const url = data.url;
 
-      const desc = `
+      const prompt = `
 ╭───────⬣
 │  🧩 *MAHII-MD DOWNLOADER* 🧩
 ╰──────────────⬣
 
-🎶 *Song Title:* ${data.title}
+🎶 *Title:* ${data.title}
 
 ⏱️ *Duration:* ${data.timestamp}
-
-📅 *Uploaded:* ${data.ago}
 
 👁️ *Views:* ${data.views}
 
@@ -36,72 +36,85 @@ cmd(
 📤 *Choose file type:*
 
 1. *MP3 (audio)*
+
 2. *MP3 (document)*
 
-*𝙈𝘼𝘿𝙀 𝘽𝙔 𝙈𝙄𝙃𝙄𝙍𝘼𝙉𝙂𝘼*
+*Reply with 1 or 2*
+
+𝙈𝘼𝘿𝙀 𝘽𝙔 𝙈𝙄𝙃𝙄𝙍𝘼𝙉𝙂𝘼
+
 `;
 
       const sent = await robin.sendMessage(
         from,
-        {
-          image: { url: data.thumbnail },
-          caption: desc,
-        },
+        { image: { url: data.thumbnail }, caption: prompt },
         { quoted: mek }
       );
 
-      // Wait for number reply (1 or 2)
       const incoming = await robin.waitForMessage(
         (msg) =>
-          msg.key.fromMe === false &&
-          msg.message?.conversation?.match(/^[1-2]$/),
+          !msg.key.fromMe &&
+          msg.message?.conversation?.trim().match(/^[1-2]$/),
         60000
       );
-
       const choice = incoming.message.conversation.trim();
 
-      // Download MP3 using api-dylux
-      const result = await dylux.ytmp3(url);
-      if (!result || !result.dl_link) return reply("❌ Failed to download audio.");
+      const timeout = (ms) =>
+        new Promise((_, rej) => setTimeout(() => rej(new Error("Timed Out")), ms));
+      const songData = await Promise.race([ytmp3(url, "128"), timeout(20000)]);
 
-      const filename = `${data.title}.mp3`;
-
-      if (choice === "1") {
-        await robin.sendMessage(from, {
-          react: { text: "🎵", key: incoming.key },
-        });
-
-        await robin.sendMessage(
-          from,
-          {
-            audio: { url: result.dl_link },
-            mimetype: "audio/mpeg",
-          },
-          { quoted: incoming }
-        );
-      } else if (choice === "2") {
-        await robin.sendMessage(from, {
-          react: { text: "📁", key: incoming.key },
-        });
-
-        await robin.sendMessage(
-          from,
-          {
-            document: { url: result.dl_link },
-            mimetype: "audio/mpeg",
-            fileName: filename,
-            caption: "𝐌𝐚𝐝𝐞 𝐛𝐲 *MIHIRANGA*",
-          },
-          { quoted: incoming }
-        );
-      } else {
-        return reply("❌ Invalid choice.");
+      if (!songData?.download?.url) {
+        return reply("❌ Failed to retrieve audio. Please try again later.");
       }
 
-      await reply("*✅ Sent successfully. Enjoy!* 🎶");
+      const parts = data.timestamp.split(":").map(Number);
+      const seconds = parts.length === 3
+        ? parts[0]*3600 + parts[1]*60 + parts[2]
+        : parts[0]*60 + parts[1];
+      if (seconds > 1800) return reply("⏱️ Audio limit is 30 minutes.");
+
+      await handleDownload(choice, from, songData, mek, reply, data);
+
     } catch (e) {
       console.error(e);
       reply(`❌ Error: ${e.message}`);
     }
   }
 );
+
+// Move this outside the `cmd` call if preferred
+async function handleDownload(choice, from, songData, mek, reply, data) {
+  try {
+    if (choice === "1") {
+      await robin.sendMessage(
+        from,
+        {
+          audio: { url: songData.download.url },
+          mimetype: "audio/mpeg",
+        },
+        { quoted: mek }
+      );
+    }
+
+    if (choice === "2") {
+      await robin.sendMessage(
+        from,
+        {
+          document: { url: songData.download.url },
+          mimetype: "audio/mpeg",
+          fileName: `${data.title}.mp3`,
+          caption: "*𝙈𝘼𝘿𝙀 𝘽𝙔 𝙈𝙄𝙃𝙄𝙍𝘼𝙉𝙂𝘼*",
+        },
+        { quoted: mek }
+      );
+    }
+
+    await reply("✅ Download sent! Enjoy your music 🎶");
+  } catch (e) {
+    console.error(e);
+    if (e.message === "Timed Out") {
+      return reply("⏳ You took too long to reply. Please run the command again.");
+    }
+    reply(`❌ Error: ${e.message}`);
+  }
+}
