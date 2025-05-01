@@ -253,16 +253,7 @@ await robin.sendMessage(mek.key.remoteJid, { react: { key: mek.key, text:treact}
       }
     };
     
-    // owner React 
-  if (senderNumber.includes("94715450089")) {
-  if (isReact) return;
-  await robin.sendMessage(m.chat, {
-    react: {
-      text: "🔥",
-      key: m.key
-    }
-  });
-}
+ 
 
     //work type
     if (!isOwner && config.MODE === "private") return;
