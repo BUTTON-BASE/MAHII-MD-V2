@@ -1,4 +1,4 @@
- plugins/fbdown.js
+plugins/fbdown.js
 const { cmd } = require("../command");
 const axios = require("axios");
 
@@ -37,3 +37,5 @@ cmd(
     } catch (e) {
       console.error(e);
       reply(`❌ *Failed to download:* ${e.message}`);
+
+    }})
