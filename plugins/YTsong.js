@@ -5,7 +5,7 @@ const axios = require("axios");
 
 cmd(
   {
-    pattern: "mp3",
+    pattern: "song",
     react: "🎵",
     desc: "Download YouTube Audio",
     category: "download",
