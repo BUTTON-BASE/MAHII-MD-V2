@@ -49,5 +49,5 @@ async (robin, mek, m, { from, body }) => {
     } else if (m.quoted.type === 'extendedTextMessage') {
       await robin.sendMessage(from, { text: m.quoted.msg.text });
     }
-  });
-
+  }
+})
