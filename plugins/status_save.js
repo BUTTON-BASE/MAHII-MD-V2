@@ -1,6 +1,4 @@
 const { cmd } = require("../command");
-const { getRandom } = require('../lib/functions');
-const fs = require('fs');
 
 cmd(
 {
@@ -20,13 +18,19 @@ async (robin, mek, m, { from, body }) => {
   let kk = keywords.map(word => word.toLowerCase());
 
   if (kk.includes(bdy)) {
-    const caption = `𝙈𝘼𝙃𝙄𝙄 𝙈𝘿 𝙎𝙏𝘼𝙏𝙐𝙎 𝘿𝙊𝙒𝙉𝙇𝙊𝘿𝙀𝙍`;
+    const defaultCaption = `𝙈𝘼𝙃𝙄𝙄 𝙈𝘿 𝙎𝙏𝘼𝙏𝙐𝙎 𝘿𝙊𝙒𝙉𝙇𝙊𝘿𝙀𝙍`;
+    let original = m.quoted.caption || m.quoted.msg?.text || '';
+
+    let finalCaption = defaultCaption;
+    if (original) {
+      finalCaption += `\n\n📌*Caption:*\n${original}`;
+    }
 
     if (m.quoted.type === 'imageMessage') {
       let buff = await m.quoted.download();
       return await robin.sendMessage(from, {
         image: buff,
-        caption
+        caption: finalCaption
       });
 
     } else if (m.quoted.type === 'videoMessage') {
@@ -35,7 +39,7 @@ async (robin, mek, m, { from, body }) => {
         video: buff,
         mimetype: "video/mp4",
         fileName: `${m.id}.mp4`,
-        caption
+        caption: finalCaption
       }, { quoted: mek });
 
     } else if (m.quoted.type === 'audioMessage') {
@@ -47,7 +51,7 @@ async (robin, mek, m, { from, body }) => {
       }, { quoted: mek });
 
     } else if (m.quoted.type === 'extendedTextMessage') {
-      await robin.sendMessage(from, { text: m.quoted.msg.text });
+      await robin.sendMessage(from, { text: finalCaption });
     }
   }
-})
+});
