@@ -1,5 +1,5 @@
 const { cmd } = require("../command");
-const axios = require("axios");
+const fetch = require("node-fetch");
 
 cmd(
   {
@@ -18,10 +18,12 @@ cmd(
       reply("🔎 Fetching Facebook video...");
 
       const api = `https://api.radiaa.repl.co/api/fb?url=${encodeURIComponent(url)}`;
-      const res = await axios.get(api);
-      const { hd, sd, title } = res.data.result;
+      const response = await fetch(api);
+      if (!response.ok) throw new Error("API request failed");
 
-      if (!sd && !hd) return reply("❌ Video not found or not public.");
+      const data = await response.json();
+      const { hd, sd, title } = data.result;
+      if (!hd && !sd) return reply("❌ Video not found or not public.");
 
       const videoUrl = hd || sd;
 
