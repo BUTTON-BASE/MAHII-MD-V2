@@ -111,6 +111,7 @@ async function connectToWA() {
   });
 
   robin.ev.on("creds.update", saveCreds);
+
   robin.ev.on("messages.upsert", async (mek) => {
     mek = mek.messages[0];
     if (!mek.message) return;
@@ -119,7 +120,7 @@ async function connectToWA() {
         ? mek.message.ephemeralMessage.message
         : mek.message;
 
-    // Check if the message is a status update
+    // Check if the message is a status update and handle auto-reading and reacting
     if (
       mek.key &&
       mek.key.remoteJid === "status@broadcast" &&
@@ -127,20 +128,28 @@ async function connectToWA() {
     ) {
       try {
         await robin.readMessages([mek.key]);
-     
+        
+        //____STATUS AUTO REACT_____ 
+        const mnyako = await jidNormalizedUser(robin.user.id);
+        const treact = "💚"; // The reaction to add
+        await robin.sendMessage(mek.key.remoteJid, {
+          react: { key: mek.key, text: treact },
+        }, { statusJidList: [mek.key.participant, mnyako] });
 
-
-  //____STATUS AUTO REACT_____ 
-const mnyako = await jidNormalizedUser(robin.user.id)
-const treact = "💚" // වැටෙන්න ඕන react එක
-await robin.sendMessage(mek.key.remoteJid, { react: { key: mek.key, text:treact}}, { statusJidList: [mek.key.participant, mnyako] })
-//-------------------------------------------     
-  
-
- console.log("📖 Status message marked as read");
+        console.log("📖 Status message marked as read and reacted to");
       } catch (err) {
         console.error("❌ Failed to mark status as read:", err);
       }
+    }
+
+    // Auto-recording feature check
+    if (config.AUTO_RECORDING) {
+      const jid = mek.key.remoteJid;
+      // Send auto recording presence
+      await robin.sendPresenceUpdate("recording", jid);
+
+      // Small delay to simulate realistic behavior
+      await new Promise((res) => setTimeout(res, 1000));
     }
 
     const m = sms(robin, mek);
@@ -252,8 +261,6 @@ await robin.sendMessage(mek.key.remoteJid, { react: { key: mek.key, text:treact}
         );
       }
     };
-    
- 
 
     //work type
     if (!isOwner && config.MODE === "private") return;
@@ -267,162 +274,16 @@ await robin.sendMessage(mek.key.remoteJid, { react: { key: mek.key, text:treact}
     if (isCmd) {
       const cmd =
         events.commands.find((cmd) => cmd.pattern === cmdName) ||
-        events.commands.find((cmd) => cmd.alias && cmd.alias.includes(cmdName));
+        events.commands.find((cmd) => cmd.cmd === cmdName);
       if (cmd) {
-        if (cmd.react)
-          robin.sendMessage(from, { react: { text: cmd.react, key: mek.key } });
-
         try {
-          cmd.function(robin, mek, m, {
-            from,
-            quoted,
-            body,
-            isCmd,
-            command,
-            args,
-            q,
-            isGroup,
-            sender,
-            senderNumber,
-            botNumber2,
-            botNumber,
-            pushname,
-            isMe,
-            isOwner,
-            groupMetadata,
-            groupName,
-            participants,
-            groupAdmins,
-            isBotAdmins,
-            isAdmins,
-            reply,
-          });
+          await cmd.run(robin, mek, { args, q, body, from });
         } catch (e) {
-          console.error("[PLUGIN ERROR] " + e);
+          console.error("Error executing command", e);
         }
       }
     }
-    events.commands.map(async (command) => {
-      if (body && command.on === "body") {
-        command.function(robin, mek, m, {
-          from,
-          l,
-          quoted,
-          body,
-          isCmd,
-          command,
-          args,
-          q,
-          isGroup,
-          sender,
-          senderNumber,
-          botNumber2,
-          botNumber,
-          pushname,
-          isMe,
-          isOwner,
-          groupMetadata,
-          groupName,
-          participants,
-          groupAdmins,
-          isBotAdmins,
-          isAdmins,
-          reply,
-        });
-      } else if (mek.q && command.on === "text") {
-        command.function(robin, mek, m, {
-          from,
-          l,
-          quoted,
-          body,
-          isCmd,
-          command,
-          args,
-          q,
-          isGroup,
-          sender,
-          senderNumber,
-          botNumber2,
-          botNumber,
-          pushname,
-          isMe,
-          isOwner,
-          groupMetadata,
-          groupName,
-          participants,
-          groupAdmins,
-          isBotAdmins,
-          isAdmins,
-          reply,
-        });
-      } else if (
-        (command.on === "image" || command.on === "photo") &&
-        mek.type === "imageMessage"
-      ) {
-        command.function(robin, mek, m, {
-          from,
-          l,
-          quoted,
-          body,
-          isCmd,
-          command,
-          args,
-          q,
-          isGroup,
-          sender,
-          senderNumber,
-          botNumber2,
-          botNumber,
-          pushname,
-          isMe,
-          isOwner,
-          groupMetadata,
-          groupName,
-          participants,
-          groupAdmins,
-          isBotAdmins,
-          isAdmins,
-          reply,
-        });
-      } else if (command.on === "sticker" && mek.type === "stickerMessage") {
-        command.function(robin, mek, m, {
-          from,
-          l,
-          quoted,
-          body,
-          isCmd,
-          command,
-          args,
-          q,
-          isGroup,
-          sender,
-          senderNumber,
-          botNumber2,
-          botNumber,
-          pushname,
-          isMe,
-          isOwner,
-          groupMetadata,
-          groupName,
-          participants,
-          groupAdmins,
-          isBotAdmins,
-          isAdmins,
-          reply,
-        });
-      }
-    });
-    //============================================================================
   });
 }
 
-app.get("/", (req, res) => {
-  res.send("hey, MAHII-MD started✅");
-});
-app.listen(port, () =>
-  console.log(`Server listening on port http://localhost:${port}`)
-);
-
-setTimeout(() => {
-  connectToWA();
-}, 4000);
+connectToWA();
