@@ -14,6 +14,5 @@ module.exports = {
   AUTO_REACT_STATUS: process.env.AUTO_REACT_STATUS || "true",
   MODE : process.env.Mode || "public", 
   AUTO_STATUS_LIKE: process.env.AUTO_STATUS_LIKE || "true", 
-  AUTO_REACT: process.env.AUTO_REACT || true,
   AUTO_RECORDING: convertToBool(process.env.AUTO_RECORDING || "true"), 
 };
