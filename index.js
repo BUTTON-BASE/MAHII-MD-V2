@@ -101,7 +101,7 @@ async function connectToWA() {
         },
         caption: up,
       });
-      robin.sendMessage("94714971189@s.whatsapp.net", {
+      robin.sendMessage("94721229780@s.whatsapp.net", {
         image: {
           url: `https://github.com/Mahii-Botz/Mahii-md-LOGO/blob/main/ChatGPT%20Image%20Apr%2021,%202025,%2005_32_50%20PM.png?raw=true`,
         },
