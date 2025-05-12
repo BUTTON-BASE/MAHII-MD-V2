@@ -8,11 +8,11 @@ function convertToBool(text, fault = "true") {
 
 module.exports = {
   SESSION_ID: process.env.SESSION_ID || "JmEEWLwa#dYqEbxhVyZkmXePJKWxn2thT4x85hTb552Sm_CDrwnc",
-  OWNER_NUM: process.env.OWNER_NUM || "94714971189",
+  OWNER_NUM: process.env.OWNER_NUM || "94721229780",
   PREFIX: process.env.PREFIX || ".",
   AUTO_READ_STATUS: process.env.AUTO_READ_STATUS || "true",
   AUTO_REACT_STATUS: process.env.AUTO_REACT_STATUS || "true",
-  MODE : process.env.Mode || "public", 
+  MODE : process.env.MODE || "public", 
   AUTO_STATUS_LIKE: process.env.AUTO_STATUS_LIKE || "true", 
   AUTO_RECORDING: convertToBool(process.env.AUTO_RECORDING || "true"), 
 };
