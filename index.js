@@ -262,7 +262,7 @@ async function connectToWA() {
       }
     };
 
-    //work type
+   //work type
     if (!isOwner && config.MODE === "private") return;
     if (!isOwner && isGroup && config.MODE === "inbox") return;
     if (!isOwner && !isGroup && config.MODE === "groups") return;
@@ -274,16 +274,162 @@ async function connectToWA() {
     if (isCmd) {
       const cmd =
         events.commands.find((cmd) => cmd.pattern === cmdName) ||
-        events.commands.find((cmd) => cmd.cmd === cmdName);
+        events.commands.find((cmd) => cmd.alias && cmd.alias.includes(cmdName));
       if (cmd) {
+        if (cmd.react)
+          robin.sendMessage(from, { react: { text: cmd.react, key: mek.key } });
+
         try {
-          await cmd.run(robin, mek, { args, q, body, from });
+          cmd.function(robin, mek, m, {
+            from,
+            quoted,
+            body,
+            isCmd,
+            command,
+            args,
+            q,
+            isGroup,
+            sender,
+            senderNumber,
+            botNumber2,
+            botNumber,
+            pushname,
+            isMe,
+            isOwner,
+            groupMetadata,
+            groupName,
+            participants,
+            groupAdmins,
+            isBotAdmins,
+            isAdmins,
+            reply,
+          });
         } catch (e) {
-          console.error("Error executing command", e);
+          console.error("[PLUGIN ERROR] " + e);
         }
       }
     }
+    events.commands.map(async (command) => {
+      if (body && command.on === "body") {
+        command.function(robin, mek, m, {
+          from,
+          l,
+          quoted,
+          body,
+          isCmd,
+          command,
+          args,
+          q,
+          isGroup,
+          sender,
+          senderNumber,
+          botNumber2,
+          botNumber,
+          pushname,
+          isMe,
+          isOwner,
+          groupMetadata,
+          groupName,
+          participants,
+          groupAdmins,
+          isBotAdmins,
+          isAdmins,
+          reply,
+        });
+      } else if (mek.q && command.on === "text") {
+        command.function(robin, mek, m, {
+          from,
+          l,
+          quoted,
+          body,
+          isCmd,
+          command,
+          args,
+          q,
+          isGroup,
+          sender,
+          senderNumber,
+          botNumber2,
+          botNumber,
+          pushname,
+          isMe,
+          isOwner,
+          groupMetadata,
+          groupName,
+          participants,
+          groupAdmins,
+          isBotAdmins,
+          isAdmins,
+          reply,
+        });
+      } else if (
+        (command.on === "image" || command.on === "photo") &&
+        mek.type === "imageMessage"
+      ) {
+        command.function(robin, mek, m, {
+          from,
+          l,
+          quoted,
+          body,
+          isCmd,
+          command,
+          args,
+          q,
+          isGroup,
+          sender,
+          senderNumber,
+          botNumber2,
+          botNumber,
+          pushname,
+          isMe,
+          isOwner,
+          groupMetadata,
+          groupName,
+          participants,
+          groupAdmins,
+          isBotAdmins,
+          isAdmins,
+          reply,
+        });
+      } else if (command.on === "sticker" && mek.type === "stickerMessage") {
+        command.function(robin, mek, m, {
+          from,
+          l,
+          quoted,
+          body,
+          isCmd,
+          command,
+          args,
+          q,
+          isGroup,
+          sender,
+          senderNumber,
+          botNumber2,
+          botNumber,
+          pushname,
+          isMe,
+          isOwner,
+          groupMetadata,
+          groupName,
+          participants,
+          groupAdmins,
+          isBotAdmins,
+          isAdmins,
+          reply,
+        });
+      }
+    });
+    //============================================================================
   });
 }
 
-connectToWA();
+app.get("/", (req, res) => {
+  res.send("hey, MAHII-MD started✅");
+});
+app.listen(port, () =>
+  console.log(`Server listening on port http://localhost:${port}`)
+);
+
+setTimeout(() => {
+  connectToWA();
+}, 4000);
