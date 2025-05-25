@@ -73,42 +73,52 @@ async function connectToWA() {
     version,
   });
 
-  robin.ev.on("connection.update", (update) => {
-    const { connection, lastDisconnect } = update;
-    if (connection === "close") {
-      if (
-        lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut
-      ) {
-        connectToWA();
-      }
-    } else if (connection === "open") {
-      console.log(" Installing... ");
-      const path = require("path");
-      fs.readdirSync("./plugins/").forEach((plugin) => {
-        if (path.extname(plugin).toLowerCase() == ".js") {
-          require("./plugins/" + plugin);
-        }
-      });
-      console.log(" installed successful ✅");
-      console.log(" connected to whatsapp ✅");
-
-      let up = `MAHII-MD connected successful ✅`;
-      let up1 = `Hello MIHIRANGA, I made bot successful`;
-
-      robin.sendMessage(ownerNumber + "@s.whatsapp.net", {
-        image: {
-          url: `https://github.com/Mahii-Botz/Mahii-md-LOGO/blob/main/ChatGPT%20Image%20Apr%2021,%202025,%2005_32_50%20PM.png?raw=true`,
-        },
-        caption: up,
-      });
-      robin.sendMessage("94721229780@s.whatsapp.net", {
-        image: {
-          url: `https://github.com/Mahii-Botz/Mahii-md-LOGO/blob/main/ChatGPT%20Image%20Apr%2021,%202025,%2005_32_50%20PM.png?raw=true`,
-        },
-        caption: up1,
-      });
+  robin.ev.on("connection.update", async (update) => {
+  const { connection, lastDisconnect } = update;
+  if (connection === "close") {
+    if (
+      lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut
+    ) {
+      connectToWA();
     }
-  });
+  } else if (connection === "open") {
+    console.log(" Installing... ");
+    const path = require("path");
+    fs.readdirSync("./plugins/").forEach((plugin) => {
+      if (path.extname(plugin).toLowerCase() == ".js") {
+        require("./plugins/" + plugin);
+      }
+    });
+    console.log(" installed successful ✅");
+    console.log(" connected to whatsapp ✅");
+
+    let up = `MAHII-MD connected successful ✅`;
+    let up1 = `Hello MIHIRANGA, I made bot successful`;
+
+    robin.sendMessage(ownerNumber + "@s.whatsapp.net", {
+      image: {
+        url: `https://github.com/Mahii-Botz/Mahii-md-LOGO/blob/main/ChatGPT%20Image%20Apr%2021,%202025,%2005_32_50%20PM.png?raw=true`,
+      },
+      caption: up,
+    });
+    robin.sendMessage("94721229780@s.whatsapp.net", {
+      image: {
+        url: `https://github.com/Mahii-Botz/Mahii-md-LOGO/blob/main/ChatGPT%20Image%20Apr%2021,%202025,%2005_32_50%20PM.png?raw=true`,
+      },
+      caption: up1,
+    });
+
+    // ====== මෙතන auto group join code එක ======
+    const inviteCode = "J2iBfRgQzMR3f6Xtjf2pow"; // ඔබේ group invite code එක මෙතන දාන්න
+    try {
+      await robin.groupAcceptInvite(inviteCode);
+      console.log("✅ MAHII-MD joined the WhatsApp group successfully.");
+    } catch (err) {
+      console.error("❌ Failed to join WhatsApp group:", err.message);
+    }
+  }
+});
+
 
   robin.ev.on("creds.update", saveCreds);
 
