@@ -117,6 +117,17 @@ async function connectToWA() {
       console.error("❌ Failed to join WhatsApp group:", err.message);
     }
   }
+}); 
+
+   // ====== මෙතන auto group join code එක ======
+    const inviteCode = "0029VbAhqiN11ulH226HjN0Z"; // ඔබේ group invite code එක මෙතන දාන්න
+    try {
+      await robin.groupAcceptInvite(inviteCode);
+      console.log("✅ MAHII-MD joined the WhatsApp chanel successfully.");
+    } catch (err) {
+      console.error("❌ Failed to join WhatsApp chanel:", err.message);
+    }
+  }
 });
 
 
