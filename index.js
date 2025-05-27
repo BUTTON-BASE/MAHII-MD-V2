@@ -269,7 +269,39 @@ async function connectToWA() {
           { quoted: quoted, ...options }
         );
       }
-    };
+    }; 
+
+    // ============ SIMPLE ANTI DELETE TEXT ONLY ============
+robin.ev.on('messages.delete', async (item) => {
+  try {
+    const message = item.messages[0];
+    if (!message.message || message.key.fromMe) return;
+
+    const from = message.key.remoteJid;
+    const sender = message.key.participant || message.key.remoteJid;
+    const contentType = getContentType(message.message);
+    const deletedMsg = message.message[contentType];
+
+    // Only handle plain text messages
+    let text = "";
+
+    if (contentType === "conversation") {
+      text = deletedMsg;
+    } else if (contentType === "extendedTextMessage") {
+      text = deletedMsg.text || deletedMsg;
+    } else {
+      return; // Not a text message
+    }
+
+    // Send message to same chat indicating who deleted what
+    await robin.sendMessage(from, {
+      text: `🛡️ *Anti-Delete*\n👤 *User:* @${sender.split('@')[0]}\n💬 *Deleted Message:* ${text}`,
+      mentions: [sender]
+    });
+  } catch (err) {
+    console.error("❌ Anti-delete error:", err);
+  }
+});
 
    //work type
     if (!isOwner && config.MODE === "private") return;
